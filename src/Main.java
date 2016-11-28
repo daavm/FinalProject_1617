@@ -216,7 +216,7 @@ public class Main {
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
                     }
-                } else if (lastAction.equals("right")) {
+                } else if (lastAction.equals("right") && (x+1) < 50) {
                     Cell location = floors[ii].getCells()[x+1][y];
                     if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
                         floors[ii].getItems()[location.getItemId()].setTaken(true);
@@ -260,7 +260,7 @@ public class Main {
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
                     }
-                } else if (lastAction.equals("up")) {
+                } else if (lastAction.equals("up") && (y-1) >= 0) {
                     Cell location = floors[ii].getCells()[x][y-1];
                     if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
                         floors[ii].getItems()[location.getItemId()].setTaken(true);
@@ -304,7 +304,7 @@ public class Main {
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
                     }
-                } else if (lastAction.equals("down")) {
+                } else if (lastAction.equals("down") && (y+1) < 50) {
                     Cell location = floors[ii].getCells()[x][y+1];
                     if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
                         floors[ii].getItems()[location.getItemId()].setTaken(true);
@@ -351,7 +351,8 @@ public class Main {
                     }
                 }
                 //Show and set cells explored by perception
-                if (x < 49) {
+                //TODO sometimes items disappear when exploring their location (BUG)
+                if (x + player.getPerception() <= 49) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
                         Cell location = floors[ii].getCells()[x + perception][y];
                         if (location.getWall()) {
@@ -379,7 +380,7 @@ public class Main {
                         }
                     }
                 }
-                if (y + player.getPerception() <  49) {
+                if (y + player.getPerception() <=  49) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
                         Cell location = floors[ii].getCells()[x][y + perception];
                         if (location.getWall()) {
@@ -394,7 +395,7 @@ public class Main {
                         }
                     }
                 }
-                if (y > 0) {
+                if (y - player.getPerception() >= 0) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
                         Cell location = floors[ii].getCells()[x][y - perception]; //Cell data type to avoid typing a lot of code many times
                         if (location.getWall()) {
@@ -410,30 +411,39 @@ public class Main {
                 }
                 //paint extra cells when perception is 2
                 if(player.getPerception() > 1) {
-                    Cell loc = floors[ii].getCells()[x-1][y-1];
-                    int perception = player.getPerception() - 1;
-                    if (loc.getWall()) {
-                        gui.md_setSquareColor(x - 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                    } else {
-                        gui.md_setSquareColor(x - 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                    Cell loc = floors[ii].getCells()[x][y];
+                    if(x - 1 >= 0 && y -1 >= 0){
+                        loc = floors[ii].getCells()[x-1][y-1];
+                        int perception = player.getPerception() - 1;
+                        if (loc.getWall()) {
+                            gui.md_setSquareColor(x - 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        } else {
+                            gui.md_setSquareColor(x - 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        }
                     }
-                    loc = floors[ii].getCells()[x+1][y-1];
-                    if (loc.getWall()) {
-                        gui.md_setSquareColor(x + 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                    } else {
-                        gui.md_setSquareColor(x + 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                    if(x + 1 <= 49 && y -1 >= 0) {
+                        loc = floors[ii].getCells()[x + 1][y - 1];
+                        if (loc.getWall()) {
+                            gui.md_setSquareColor(x + 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        } else {
+                            gui.md_setSquareColor(x + 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        }
                     }
-                    loc = floors[ii].getCells()[x-1][y+1];
-                    if (loc.getWall()) {
-                        gui.md_setSquareColor(x - 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                    } else {
-                        gui.md_setSquareColor(x - 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                    if(x - 1 >= 0 && y + 1 <= 49) {
+                        loc = floors[ii].getCells()[x - 1][y + 1];
+                        if (loc.getWall()) {
+                            gui.md_setSquareColor(x - 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        } else {
+                            gui.md_setSquareColor(x - 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        }
                     }
-                    loc = floors[ii].getCells()[x+1][y+1];
-                    if (loc.getWall()) {
-                        gui.md_setSquareColor(x + 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                    } else {
-                        gui.md_setSquareColor(x + 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                    if(x + 1 <= 49 && y + 1 <= 49) {
+                        loc = floors[ii].getCells()[x + 1][y + 1];
+                        if (loc.getWall()) {
+                            gui.md_setSquareColor(x + 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        } else {
+                            gui.md_setSquareColor(x + 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
+                        }
                     }
                 }
                 Thread.sleep(1);

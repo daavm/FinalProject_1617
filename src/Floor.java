@@ -70,8 +70,9 @@ public class Floor {
                         thirdCorridor = (int)(Math.random()*3+1);
                     }
                 }
-            } else { //CORRIDOR
-                int length = (int)(Math.random()*30+1);
+            } else { //CORRIDOR //TODO don't generate 2 corridors together (x - x+-1 or y - y+-1)
+                //TODO sometimes corridors are not accesible (not connected)
+                int length = (int)(Math.random()*15+1);
                 for(int jj = 1; jj > 0; jj++){
                     int direction = (int)(Math.random()*4);
 
@@ -102,7 +103,7 @@ public class Floor {
                             break;
                     }
                 }
-                for(int jj = 0; jj < 2; jj++){
+                for(int jj = 0; jj < length; jj++){
                     System.out.println(x + y);
                     switch (lastDirection){
                         case 0:
