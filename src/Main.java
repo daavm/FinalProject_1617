@@ -9,6 +9,13 @@ public class Main {
         int eyeCount = 0; //eyecount goes here because there can only be 1 eye per 5 levels, and this game has only 5 levels(floors), so will only appear once
         for (int ii = 0; ii < floors.length; ii++) {
             floors[ii] = new Floor(ii);
+            for (int x1 = 1; x1 > 0; x1++) { //set start coordinates
+                floors[ii].setStartX((int) (Math.random() * 50));
+                floors[ii].setStartY((int) (Math.random() * 50));
+                if (floors[ii].getCells()[floors[ii].getStartX()][floors[ii].getStartY()].getWall()) {
+                    x1 = -1;
+                }
+            }
         }
         Player player = new Player();
         for (int ii = 0; ii < floors.length; ii++) {
@@ -27,13 +34,7 @@ public class Main {
 
             //if(floor.isPassed()){
 
-                for (int x1 = 1; x1 > 0; x1++) { //set start coordinates
-                    floors[ii].setStartX((int) (Math.random() * 50));
-                    floors[ii].setStartY((int) (Math.random() * 50));
-                    if (floors[ii].getCells()[floors[ii].getStartX()][floors[ii].getStartY()].getWall()) {
-                        x1 = -1;
-                    }
-                }
+
 
             //show alive enemies, onthefloor items,etc...
             //seeing first if the boss is killed so the floor is explored...etc floor.isExplored() <-- add
@@ -144,7 +145,7 @@ public class Main {
                     }
                 }
                 //TODO only to test maps
-                gui.md_setSpriteVisible(id_count, true);
+//                gui.md_setSpriteVisible(id_count, true);
 
             }
             int x = floors[ii].getStartX(), y = floors[ii].getStartY();
@@ -351,111 +352,76 @@ public class Main {
                     }
                 }
                 //Show and set cells explored by perception
-                //TODO sometimes items disappear when exploring their location (BUG)
+                //TODO sometimes items disappear when exploring their location (BUG), maybe something to be with perception-1
                 if (x + player.getPerception() <= 49) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
-                        Cell location = floors[ii].getCells()[x + perception][y];
-                        if (location.getWall()) {
-                            gui.md_setSquareColor(x + perception, y, (int)location.getRed(), (int)location.getGreen(), (int)location.getBlue());
-                        } else {
-                            gui.md_setSquareColor((x + perception), y, 112, 112, 112);
-                        }
-                        location.setExplored(true);
-                        if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                            gui.md_setSpriteVisible((location.getItemId()), true);
-                        }
+                        paintPerception(x + perception, y, gui, floors, ii);
                     }
                 }
                 if (x - player.getPerception() >= 0) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
-                        Cell location = floors[ii].getCells()[x - perception][y];
-                        if (location.getWall()) {
-                            gui.md_setSquareColor(x - perception, y, (int)location.getRed(), (int)location.getGreen(), (int)location.getBlue());
-                        } else {
-                            gui.md_setSquareColor((x - perception), y, 112, 112, 112);
-                        }
-                        location.setExplored(true);
-                        if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                            gui.md_setSpriteVisible(location.getItemId(), true);
-                        }
+                        paintPerception(x - perception, y, gui, floors, ii);
                     }
                 }
                 if (y + player.getPerception() <=  49) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
-                        Cell location = floors[ii].getCells()[x][y + perception];
-                        if (location.getWall()) {
-                            gui.md_setSquareColor(x, (y + perception), (int)location.getRed(), (int)location.getGreen(), (int)location.getBlue());
-                        } else {
-                            gui.md_setSquareColor(x, (y + perception), 112, 112, 112);
-                        }
-                        location.setExplored(true);
-
-                        if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                            gui.md_setSpriteVisible(location.getItemId(), true);
-                        }
+                        paintPerception(x, y + perception, gui, floors, ii);
                     }
                 }
                 if (y - player.getPerception() >= 0) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
-                        Cell location = floors[ii].getCells()[x][y - perception]; //Cell data type to avoid typing a lot of code many times
-                        if (location.getWall()) {
-                            gui.md_setSquareColor(x, (y - perception), (int)location.getRed(), (int)location.getGreen(), (int)location.getBlue());
-                        } else {
-                            gui.md_setSquareColor(x, (y - perception), 112, 112, 112);
-                        }
-                        location.setExplored(true);
-                        if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                            gui.md_setSpriteVisible(location.getItemId(), true);
-                        }
+                        paintPerception(x, y - perception, gui, floors, ii);
                     }
                 }
                 //paint extra cells when perception is 2
                 if(player.getPerception() > 1) {
                     Cell loc = floors[ii].getCells()[x][y];
                     if(x - 1 >= 0 && y -1 >= 0){
-                        loc = floors[ii].getCells()[x-1][y-1];
-                        int perception = player.getPerception() - 1;
-                        if (loc.getWall()) {
-                            gui.md_setSquareColor(x - 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        } else {
-                            gui.md_setSquareColor(x - 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        }
+                        paintCells(x-1, y-1, gui, floors, ii);
                     }
                     if(x + 1 <= 49 && y -1 >= 0) {
-                        loc = floors[ii].getCells()[x + 1][y - 1];
-                        if (loc.getWall()) {
-                            gui.md_setSquareColor(x + 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        } else {
-                            gui.md_setSquareColor(x + 1, (y - 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        }
+                        paintCells(x+1, y-1, gui, floors, ii);
                     }
                     if(x - 1 >= 0 && y + 1 <= 49) {
-                        loc = floors[ii].getCells()[x - 1][y + 1];
-                        if (loc.getWall()) {
-                            gui.md_setSquareColor(x - 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        } else {
-                            gui.md_setSquareColor(x - 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        }
+                        paintCells(x-1, y-1, gui, floors, ii);
+
                     }
                     if(x + 1 <= 49 && y + 1 <= 49) {
-                        loc = floors[ii].getCells()[x + 1][y + 1];
-                        if (loc.getWall()) {
-                            gui.md_setSquareColor(x + 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        } else {
-                            gui.md_setSquareColor(x + 1, (y + 1), (int) loc.getRed(), (int) loc.getGreen(), (int) loc.getBlue());
-                        }
+                        paintCells(x+1, y+1, gui, floors, ii);
                     }
                 }
                 Thread.sleep(1);
                 if(floors[ii].getCells()[x][y].getRed() == 112){
                     floors[ii].setPassed(true);
+                    gui.md_clearSprites();
                 }
             } while (floors[ii].getPassed() == false);
 
         }
     }
-    public static void getNewItem(int jj){
-
+    public static void paintCells(int x, int y, MiniDungeonGUI gui, Floor[] floors, int ii){
+        if(x >= 0 && x < 50 && y >= 0 && y < 50) {
+            Cell loc = floors[ii].getCells()[x][y];
+            if (loc.getWall()) {
+                gui.md_setSquareColor(x, y, loc.getRed(), loc.getGreen(), loc.getBlue());
+            } else {
+                gui.md_setSquareColor(x, y, loc.getRed(), loc.getGreen(), loc.getBlue());
+            }
+        }
+    }
+    public static void paintPerception(int x, int y, MiniDungeonGUI gui, Floor[] floors, int ii){
+        if(x >= 0 && x < 50 && y >= 0 && y < 50) {
+            Cell location = floors[ii].getCells()[x][y]; //Cell data type to avoid typing a lot of code many times
+            if (location.getWall()) {
+                gui.md_setSquareColor(x, (y), location.getRed(), location.getGreen(), location.getBlue());
+            } else {
+                gui.md_setSquareColor(x, (y), 112, 112, 112);
+            }
+            location.setExplored(true);
+            if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
+                gui.md_setSpriteVisible(location.getItemId(), true);
+            }
+        }
     }
 }
 
