@@ -19,7 +19,6 @@ public class Main {
         }
         Player player = new Player();
         for (int ii = 0; ii < floors.length; ii++) {
-            int swordCount = 0, heartCount = 0, id_count = 1;
             //colorize stock board (black)
             for (int kk = 0; kk < 50; kk++) {
                 for (int jj = 0; jj < 50; jj++) {
@@ -65,9 +64,16 @@ public class Main {
                 }
             }
             //ITEMS GENERATION
-            for (int jj = 2; jj < 8; jj++) { //number of items to generate
+            int id_count = 1;
+            for (int jj = 2; jj < 10; jj++) { //number of items to generate
+                int swordCount = 0, heartCount = 0;
                 id_count++;
-                String id = floors[ii].getItems()[jj].getName();
+                if(generateItems(gui, floors, ii, jj, id_count, eyeCount)==1) {
+                    eyeCount++;
+                }
+
+
+             /*   String id = floors[ii].getItems()[jj].getName();
                 boolean repeated = true;
                 do{
                     if ((id.equals("Sword") && swordCount > 0)) {
@@ -145,9 +151,17 @@ public class Main {
                     }
                 }
                 //TODO only to test maps
-//                gui.md_setSpriteVisible(id_count, true);
+*/
+                gui.md_setSpriteVisible(id_count, true);
 
             }
+            id_count++;
+            for (int jj = 0; jj < 10; jj++){
+                generateEnemies(gui, floors, ii, jj, id_count);
+                id_count++;
+
+            }
+            gui.md_setSquareColor(floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY(), 23, 43, 75);
             int x = floors[ii].getStartX(), y = floors[ii].getStartY();
             gui.md_setTextFood(player.getFood());
             gui.md_setTextHealthCurrent(player.getHealth());
@@ -352,7 +366,6 @@ public class Main {
                     }
                 }
                 //Show and set cells explored by perception
-                //TODO sometimes items disappear when exploring their location (BUG), maybe something to be with perception-1
                 if (x + player.getPerception() <= 49) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
                         paintPerception(x + perception, y, gui, floors, ii);
@@ -420,6 +433,101 @@ public class Main {
             location.setExplored(true);
             if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
                 gui.md_setSpriteVisible(location.getItemId(), true);
+            }
+        }
+    }
+    public static int generateItems(MiniDungeonGUI gui, Floor[] floors, int ii, int jj, int id_count, int eyeCount){
+        String id = floors[ii].getItems()[jj].getName();
+        int swordCount = floors[ii].getSwordCount(), heartCount = floors[ii].getHeartCount(), returned = 0;
+        boolean repeated = true;
+        do{
+            if ((id.equals("Sword") && swordCount > 0)) {
+                id = floors[ii].getNewItem(jj);
+                if(!id.equals("Sword")){
+                    if(id.equals("Heart") && heartCount == 0){
+                        repeated = false;
+                    } else if(id.equals("Eye") && eyeCount == 0){
+                        repeated = false;
+                    } else if(!id.equals("Heart") && !id.equals("Eye")){
+                        repeated = false;
+                    }
+                }
+            } else if(id.equals("Heart") && heartCount > 0){
+                id = floors[ii].getNewItem(jj);
+                if(!id.equals("Heart")){
+                    if(id.equals("Sword") && heartCount == 0){
+                        repeated = false;
+                    } else if(id.equals("Eye") && eyeCount == 0){
+                        repeated = false;
+                    } else if(!id.equals("Sword") && !id.equals("Eye")){
+                        repeated = false;
+                    }
+                }
+            } else if(id.equals("Eye") && eyeCount > 0){
+                id = floors[ii].getNewItem(jj);
+                if(!id.equals("Eye")){
+                    if(id.equals("Sword") && heartCount == 0){
+                        repeated = false;
+                    } else if(id.equals("Heart") && eyeCount == 0){
+                        repeated = false;
+                    } else if(!id.equals("Sword") && !id.equals("Heart")){
+                        repeated = false;
+                    }
+                }
+            } else {
+                repeated = false;
+            }
+        }while(repeated == true);
+        //gui.md_addSprite(id_count, id.toLowerCase() + ".png", true); works but it does not add eye, heart and sword count
+        switch (id) {
+            case "Apple":
+                gui.md_addSprite(id_count, "apple.png", true);
+                break;
+            case "Eye":
+                gui.md_addSprite(id_count, "eye.png", true);
+                returned = 1;
+                break;
+            case "Gold":
+                gui.md_addSprite(id_count, "gold.png", true);
+                break;
+            case "Heart":
+                gui.md_addSprite(id_count, "heart.png", true);
+                floors[ii].setHeartCount(1);
+                break;
+            case "Sword":
+                gui.md_addSprite(id_count, "sword.png", true);
+                floors[ii].setSwordCount(1);
+                break;
+            case "Potion":
+                gui.md_addSprite(id_count, "potion.png", true);
+                break;
+            default:
+                break;
+        }
+
+        floors[ii].getItems()[jj].setId(jj);
+        for (int x1 = 1; x1 > 0; x1++) {
+            int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
+            if (floors[ii].getCells()[Ix][Iy].getWall() && !floors[ii].getCells()[Ix][Iy].getHaveItem() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
+                x1 = -1;
+                gui.md_moveSprite(id_count, Ix, Iy);
+                floors[ii].getCells()[Ix][Iy].setHaveItem(true);
+                floors[ii].getCells()[Ix][Iy].setItemId(jj);
+            }
+        }
+        //TODO only to test maps
+//                gui.md_setSpriteVisible(id_count, true);
+        return returned;
+    }
+    public static void generateEnemies(MiniDungeonGUI gui, Floor[] floors, int ii, int jj, int id_count){
+        String enemy = floors[ii].getEnemies()[jj].getName();
+        gui.md_addSprite(id_count, enemy, true);
+        gui.md_setSpriteVisible(id_count, true);
+        for (int x1 = 1; x1 > 0; x1++) {
+            int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
+            if (floors[ii].getCells()[Ix][Iy].getWall() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
+                x1 = -1;
+                gui.md_moveSprite(id_count, Ix, Iy);
             }
         }
     }

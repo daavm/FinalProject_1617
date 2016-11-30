@@ -1,9 +1,8 @@
-import com.sun.javafx.runtime.SystemProperties;
-
 public class Floor {
-    private int startX, startY, number, trapdoorX, trapdoorY;
+    private int startX, startY, number, trapdoorX, trapdoorY, heartCount, swordCount;
     private Cell[][] cells = new Cell[50][50];
     private Item[] items = new Item[40];
+    private Enemy[] enemies = new Enemy[10];
     private boolean passed = false, eye;
 
     Floor(int number) {
@@ -21,7 +20,7 @@ public class Floor {
                 break;
         }
 
-        /*for (int xx = 9; xx < 14; xx++) {
+        for (int xx = 9; xx < 14; xx++) {
             for (int yy = 4; yy < 8; yy++) { //Code to create rooms and corridors
                 setCellsTrue(xx, yy);
             }
@@ -38,16 +37,16 @@ public class Floor {
             int yy = 4;
             setCellsTrue(yy, xx);
         }
-*/
-        /*for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
+
+        for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
-        }*/
-        int x = (int)(Math.random()*30), y = (int)(Math.random()*30);
+        }
+      /*  int x = (int)(Math.random()*30), y = (int)(Math.random()*30);
         int lastDirection = 1; //let's just start with north- 1:north 2: South 3: East 4: west
-        for(int ii = 0; ii < 60; ii++) {
-            int roomCorridor = (int)(Math.random()*7); //0-6 corridor, 7 room
+        for(int ii = 0; ii < 150; ii++) {
+            int roomCorridor =  1;//(int)(Math.random()*7); //0-6 corridor, 7 room
             if(roomCorridor == 7){ //ROOM
                 int height = (int)(Math.random()*6+1);
                 int base = (int)(Math.random()*5+1);
@@ -104,28 +103,27 @@ public class Floor {
                     }
                 }
                 for(int jj = 0; jj < length; jj++){
-                    System.out.println(x + y);
                     switch (lastDirection){
                         case 0:
-                            y += 1;
+                            y = y+1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
                             }
                             break;
                         case 1:
-                            y -=1;
+                            y = y-1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
                             }
                             break;
                         case 2:
-                            x += 1;
+                            x = x+1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
                             }
                             break;
                         case 3:
-                            x -= 1;
+                            x = x-1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
                             }
@@ -133,10 +131,13 @@ public class Floor {
                     }
                 }
             }
-        }
+        }*/
 
         for (int ii = 0; ii < 40; ii++) {
             items[ii] = new Item((int) (Math.random() * 6));
+        }
+        for (int ii = 0; ii < 10; ii++) {
+            enemies[ii] = new Enemy((int) (Math.random() * 2));
         }
 
     }
@@ -148,6 +149,18 @@ public class Floor {
     }
     public int getTrapdoorX(){
         return trapdoorX;
+    }
+    public int getHeartCount(){
+        return heartCount;
+    }
+    public int getSwordCount(){
+        return swordCount;
+    }
+    public void setHeartCount(int heartCount){
+        this.heartCount = heartCount;
+    }
+    public void setSwordCount(int swordCount){
+        this.swordCount = swordCount;
     }
     public int getTrapdoorY(){
         return trapdoorY;
@@ -177,7 +190,9 @@ public class Floor {
     public boolean getEye(){
         return eye;
     }
-
+    public Enemy[] getEnemies(){
+        return enemies;
+    }
     public void setTrapdoorX(int x){
         trapdoorX = x;
     }
