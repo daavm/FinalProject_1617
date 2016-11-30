@@ -20,7 +20,7 @@ public class Floor {
                 break;
         }
 
-        for (int xx = 9; xx < 14; xx++) {
+       /* for (int xx = 9; xx < 14; xx++) {
             for (int yy = 4; yy < 8; yy++) { //Code to create rooms and corridors
                 setCellsTrue(xx, yy);
             }
@@ -42,8 +42,8 @@ public class Floor {
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
-        }
-      /*  int x = (int)(Math.random()*30), y = (int)(Math.random()*30);
+        }*/
+       int x = (int)(Math.random()*30), y = (int)(Math.random()*30);
         int lastDirection = 1; //let's just start with north- 1:north 2: South 3: East 4: west
         for(int ii = 0; ii < 150; ii++) {
             int roomCorridor =  1;//(int)(Math.random()*7); //0-6 corridor, 7 room
@@ -131,7 +131,7 @@ public class Floor {
                     }
                 }
             }
-        }*/
+        }
 
         for (int ii = 0; ii < 40; ii++) {
             items[ii] = new Item((int) (Math.random() * 6));

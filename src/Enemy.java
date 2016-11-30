@@ -3,7 +3,7 @@
  */
 public class Enemy {
     String name;
-    int health, power;
+    int health, power, x, y;
     //power puede ser 1.5
 
     Enemy(int ii){
@@ -26,7 +26,19 @@ public class Enemy {
     public int getPower(){
         return power;
     }
+    public int getX(){
+        return x;
+    }
+    public int getY(){
+        return y;
+    }
 
+    public void setX(int x){
+        this.x = x;
+    }
+    public void setY(int y){
+        this.y = y;
+    }
     public void setName(String name){
         this.name = name;
     }

@@ -403,6 +403,26 @@ public class Main {
                         paintCells(x+1, y+1, gui, floors, ii);
                     }
                 }
+                /*for(int kk = 1; kk < 10; kk++){ TODO MOVE ENEMIES
+                    int move = (int)(Math.random()*4);
+                    if(move == 0){
+                        gui.md_moveSprite(kk+10,
+                                floors[ii].getEnemies()[kk].getX()+1,
+                                floors[ii].getEnemies()[kk].getY());
+                    } else if(move == 1){
+                        gui.md_moveSprite(kk+10,
+                                floors[ii].getEnemies()[kk].getX()-1,
+                                floors[ii].getEnemies()[kk].getY());
+                    } else if(move == 2){
+                        gui.md_moveSprite(kk+10,
+                                floors[ii].getEnemies()[kk].getX(),
+                                floors[ii].getEnemies()[kk].getY()+1);
+                    } else if(move == 3){
+                        gui.md_moveSprite(kk+10,
+                                floors[ii].getEnemies()[kk].getX(),
+                                floors[ii].getEnemies()[kk].getY()-1);
+                    }
+                }*/
                 Thread.sleep(1);
                 if(floors[ii].getCells()[x][y].getRed() == 112){
                     floors[ii].setPassed(true);
@@ -527,6 +547,8 @@ public class Main {
             int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
             if (floors[ii].getCells()[Ix][Iy].getWall() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
                 x1 = -1;
+                floors[ii].getEnemies()[ii].setX(Ix);
+                floors[ii].getEnemies()[ii].setY(Iy);
                 gui.md_moveSprite(id_count, Ix, Iy);
             }
         }
