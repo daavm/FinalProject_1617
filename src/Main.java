@@ -3,7 +3,7 @@ import minidungeon.MiniDungeonGUI;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-        Floor[] floors = new Floor[5];
+        Floor[] floors = new Floor[1];
         MiniDungeonGUI gui = new MiniDungeonGUI(50, 50);
         gui.setVisible(true);
         int eyeCount = 0; //eyecount goes here because there can only be 1 eye per 5 levels, and this game has only 5 levels(floors), so will only appear once
@@ -16,6 +16,7 @@ public class Main {
                     x1 = -1;
                 }
             }
+            floors[ii].getCells()[floors[ii].getStartX()][floors[ii].getStartY()].setWall(true);
         }
         Player player = new Player();
         for (int ii = 0; ii < floors.length; ii++) {
@@ -30,6 +31,7 @@ public class Main {
                     }
                 }
             }
+
 
             //if(floor.isPassed()){
 
@@ -73,73 +75,7 @@ public class Main {
                 }
 
 
-             /*   String id = floors[ii].getItems()[jj].getName();
-                boolean repeated = true;
-                do{
-                    if ((id.equals("Sword") && swordCount > 0)) {
-                        id = floors[ii].getNewItem(jj);
-                        if(!id.equals("Sword")){
-                            if(id.equals("Heart") && heartCount == 0){
-                                repeated = false;
-                            } else if(id.equals("Eye") && eyeCount == 0){
-                                repeated = false;
-                            } else if(!id.equals("Heart") && !id.equals("Eye")){
-                                repeated = false;
-                            }
-                        }
-                    } else if(id.equals("Heart") && heartCount > 0){
-                        id = floors[ii].getNewItem(jj);
-                        if(!id.equals("Heart")){
-                            if(id.equals("Sword") && heartCount == 0){
-                                repeated = false;
-                            } else if(id.equals("Eye") && eyeCount == 0){
-                                repeated = false;
-                            } else if(!id.equals("Sword") && !id.equals("Eye")){
-                                repeated = false;
-                            }
-                        }
-                    } else if(id.equals("Eye") && eyeCount > 0){
-                        id = floors[ii].getNewItem(jj);
-                        if(!id.equals("Eye")){
-                            if(id.equals("Sword") && heartCount == 0){
-                                repeated = false;
-                            } else if(id.equals("Heart") && eyeCount == 0){
-                                repeated = false;
-                            } else if(!id.equals("Sword") && !id.equals("Heart")){
-                                repeated = false;
-                            }
-                        }
-                    } else {
-                        repeated = false;
-                    }
-                }while(repeated == true);
-                //gui.md_addSprite(id_count, id.toLowerCase() + ".png", true); works but it does not add eye, heart and sword count
-                switch (id) {
-                    case "Apple":
-                        gui.md_addSprite(id_count, "apple.png", true);
-                        break;
-                    case "Eye":
-                        gui.md_addSprite(id_count, "eye.png", true);
-                        eyeCount++;
-                        break;
-                    case "Gold":
-                        gui.md_addSprite(id_count, "gold.png", true);
-                        break;
-                    case "Heart":
-                        gui.md_addSprite(id_count, "heart.png", true);
-                        heartCount++;
-                        break;
-                    case "Sword":
-                        gui.md_addSprite(id_count, "sword.png", true);
-                        swordCount++;
-                        break;
-                    case "Potion":
-                        gui.md_addSprite(id_count, "potion.png", true);
-                        break;
-                    default:
-                        break;
-                }
-
+/*
                 floors[ii].getItems()[jj].setId(jj);
                 for (int x1 = 1; x1 > 0; x1++) {
                     int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
@@ -169,7 +105,6 @@ public class Main {
             gui.md_setTextHealthMax(player.getHealth());
             gui.md_setTextPerception(player.getPerception());
             gui.md_setTextStrength(player.getPower());
-
             //sprite of the player generated
             gui.md_addSprite(1, "white-queen.png", true);
             gui.md_setSpriteVisible(1, true);
@@ -182,49 +117,12 @@ public class Main {
 
 
             //MOVE
-
+            int moveCount = 0;
             do {
                 String lastAction = gui.md_getLastAction().toLowerCase();
 
                 if (lastAction.equals("left") && (x-1) >= 0) {
-                    Cell location = floors[ii].getCells()[x-1][y];
-                    if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                        floors[ii].getItems()[location.getItemId()].setTaken(true);
-                        gui.md_setSpriteVisible((location.getItemId()), false);
-                        String item_name = floors[ii].getItems()[location.getItemId()].getName();
-                        switch (item_name){
-                            case "Sword":
-                                player.setPower(player.getPower()+1);
-                                gui.md_setTextStrength(player.getPower());
-                                break;
-                            case "Heart":
-                                player.setMaxHealth(player.getMaxHealth()+5);
-                                gui.md_setTextHealthMax(player.getMaxHealth());
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Eye":
-                                player.setPerception(player.getPerception()+1);
-                                gui.md_setTextPerception(player.getPerception());
-                                break;
-                            case "Potion":
-                                if(player.getHealth() <= (player.getMaxHealth()-10)){
-                                    player.setHealth(player.getHealth() + 10);
-                                } else {
-                                    player.setHealth(player.getHealth() + (player.getMaxHealth() - player.getHealth()));
-                                }
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Gold":
-                                player.setGold(player.getGold() + ((int)(Math.random()*901 + 100)));
-                                gui.md_setTextGold(player.getGold());
-                                break;
-                            case "Apple":
-                                player.setFood(player.getFood() + ((int)(Math.random()*141 + 40)));
-                                gui.md_setTextFood(player.getFood());
-                                break;
-                        }
-                    }
-
+                    catchItem(gui, player, (x-1), y, ii, floors);
                     if (x > 0 && floors[ii].getCells()[x - 1][y].getWall()) {
                         gui.md_moveSprite(1, (x - 1), y);
                         x--;
@@ -232,43 +130,7 @@ public class Main {
                         gui.md_setTextFood(player.getFood());
                     }
                 } else if (lastAction.equals("right") && (x+1) < 50) {
-                    Cell location = floors[ii].getCells()[x+1][y];
-                    if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                        floors[ii].getItems()[location.getItemId()].setTaken(true);
-                        gui.md_setSpriteVisible((location.getItemId()), false);
-                        String item_name = floors[ii].getItems()[location.getItemId()].getName();
-                        switch (item_name){
-                            case "Sword":
-                                player.setPower(player.getPower()+1);
-                                gui.md_setTextStrength(player.getPower());
-                                break;
-                            case "Heart":
-                                player.setMaxHealth(player.getMaxHealth()+5);
-                                gui.md_setTextHealthMax(player.getMaxHealth());
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Eye":
-                                player.setPerception(player.getPerception()+1);
-                                gui.md_setTextPerception(player.getPerception());
-                                break;
-                            case "Potion":
-                                if(player.getHealth() <= (player.getMaxHealth()-10)){
-                                    player.setHealth(player.getHealth() + 10);
-                                } else {
-                                    player.setHealth(player.getHealth() + (player.getMaxHealth() - player.getHealth()));
-                                }
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Gold":
-                                player.setGold(player.getGold() + ((int)(Math.random()*901 + 100)));
-                                gui.md_setTextGold(player.getGold());
-                                break;
-                            case "Apple":
-                                player.setFood(player.getFood() + ((int)(Math.random()*141 + 40)));
-                                gui.md_setTextFood(player.getFood());
-                                break;
-                        }
-                    }
+                    catchItem(gui, player, (x+1), y, ii, floors);
                     if (x < 49 && floors[ii].getCells()[x + 1][y].getWall()) {
                         gui.md_moveSprite(1, (x + 1), y);
                         x++;
@@ -276,43 +138,7 @@ public class Main {
                         gui.md_setTextFood(player.getFood());
                     }
                 } else if (lastAction.equals("up") && (y-1) >= 0) {
-                    Cell location = floors[ii].getCells()[x][y-1];
-                    if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                        floors[ii].getItems()[location.getItemId()].setTaken(true);
-                        gui.md_setSpriteVisible((location.getItemId()), false);
-                        String item_name = floors[ii].getItems()[location.getItemId()].getName();
-                        switch (item_name){
-                            case "Sword":
-                                player.setPower(player.getPower()+1);
-                                gui.md_setTextStrength(player.getPower());
-                                break;
-                            case "Heart":
-                                player.setMaxHealth(player.getMaxHealth()+5);
-                                gui.md_setTextHealthMax(player.getMaxHealth());
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Eye":
-                                player.setPerception(player.getPerception()+1);
-                                gui.md_setTextPerception(player.getPerception());
-                                break;
-                            case "Potion":
-                                if(player.getHealth() <= (player.getMaxHealth()-10)){
-                                    player.setHealth(player.getHealth() + 10);
-                                } else {
-                                    player.setHealth(player.getHealth() + (player.getMaxHealth() - player.getHealth()));
-                                }
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Gold":
-                                player.setGold(player.getGold() + ((int)(Math.random()*901 + 100)));
-                                gui.md_setTextGold(player.getGold());
-                                break;
-                            case "Apple":
-                                player.setFood(player.getFood() + ((int)(Math.random()*141 + 40)));
-                                gui.md_setTextFood(player.getFood());
-                                break;
-                        }
-                    }
+                    catchItem(gui, player, x, (y-1), ii, floors);
                     if (y > 0 && floors[ii].getCells()[x][y - 1].getWall()) {
                         gui.md_moveSprite(1, x, (y - 1));
                         y--;
@@ -320,43 +146,7 @@ public class Main {
                         gui.md_setTextFood(player.getFood());
                     }
                 } else if (lastAction.equals("down") && (y+1) < 50) {
-                    Cell location = floors[ii].getCells()[x][y+1];
-                    if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
-                        floors[ii].getItems()[location.getItemId()].setTaken(true);
-                        gui.md_setSpriteVisible((location.getItemId()), false);
-                        String item_name = floors[ii].getItems()[location.getItemId()].getName();
-                        switch (item_name){
-                            case "Sword":
-                                player.setPower(player.getPower()+1);
-                                gui.md_setTextStrength(player.getPower());
-                                break;
-                            case "Heart":
-                                player.setMaxHealth(player.getMaxHealth()+5);
-                                gui.md_setTextHealthMax(player.getMaxHealth());
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Eye":
-                                player.setPerception(player.getPerception()+1);
-                                gui.md_setTextPerception(player.getPerception());
-                                break;
-                            case "Potion":
-                                if(player.getHealth() <= (player.getMaxHealth()-10)){
-                                    player.setHealth(player.getHealth() + 10);
-                                } else {
-                                    player.setHealth(player.getHealth() + (player.getMaxHealth() - player.getHealth()));
-                                }
-                                gui.md_setTextHealthCurrent(player.getHealth());
-                                break;
-                            case "Gold":
-                                player.setGold(player.getGold() + ((int)(Math.random()*901 + 100)));
-                                gui.md_setTextGold(player.getGold());
-                                break;
-                            case "Apple":
-                                player.setFood(player.getFood() + ((int)(Math.random()*141 + 40)));
-                                gui.md_setTextFood(player.getFood());
-                                break;
-                        }
-                    }
+                    catchItem(gui, player, x, (y+1), ii, floors);
                     if (y < 49 && floors[ii].getCells()[x][y + 1].getWall()) {
                         gui.md_moveSprite(1, x, (y + 1));
                         gui.md_repaintBoard();
@@ -403,26 +193,35 @@ public class Main {
                         paintCells(x+1, y+1, gui, floors, ii);
                     }
                 }
-                /*for(int kk = 1; kk < 10; kk++){ TODO MOVE ENEMIES
-                    int move = (int)(Math.random()*4);
-                    if(move == 0){
-                        gui.md_moveSprite(kk+10,
-                                floors[ii].getEnemies()[kk].getX()+1,
-                                floors[ii].getEnemies()[kk].getY());
-                    } else if(move == 1){
-                        gui.md_moveSprite(kk+10,
-                                floors[ii].getEnemies()[kk].getX()-1,
-                                floors[ii].getEnemies()[kk].getY());
-                    } else if(move == 2){
-                        gui.md_moveSprite(kk+10,
-                                floors[ii].getEnemies()[kk].getX(),
-                                floors[ii].getEnemies()[kk].getY()+1);
-                    } else if(move == 3){
-                        gui.md_moveSprite(kk+10,
-                                floors[ii].getEnemies()[kk].getX(),
-                                floors[ii].getEnemies()[kk].getY()-1);
+                moveCount++;
+                if(moveCount == 750) {
+                    for (int kk = 0; kk < 10; kk++) { //TODO MOVE ENEMIES
+
+                        int move = (int) (Math.random() * 4);
+                        if (move == 0) {
+                            gui.md_moveSprite(kk + 10,
+                                    floors[ii].getEnemies()[kk].getX() + 1,
+                                    floors[ii].getEnemies()[kk].getY());
+                            floors[ii].getEnemies()[kk].setX(floors[ii].getEnemies()[kk].getX() + 1);
+                        } else if (move == 1) {
+                            gui.md_moveSprite(kk + 10,
+                                    floors[ii].getEnemies()[kk].getX() - 1,
+                                    floors[ii].getEnemies()[kk].getY());
+                            floors[ii].getEnemies()[kk].setX(floors[ii].getEnemies()[kk].getX() - 1);
+                        } else if (move == 2) {
+                            gui.md_moveSprite(kk + 10,
+                                    floors[ii].getEnemies()[kk].getX(),
+                                    floors[ii].getEnemies()[kk].getY() + 1);
+                            floors[ii].getEnemies()[kk].setY(floors[ii].getEnemies()[kk].getY() + 1);
+                        } else if (move == 3) {
+                            gui.md_moveSprite(kk + 10,
+                                    floors[ii].getEnemies()[kk].getX(),
+                                    floors[ii].getEnemies()[kk].getY() - 1);
+                            floors[ii].getEnemies()[kk].setY(floors[ii].getEnemies()[kk].getY() - 1);
+                        }
                     }
-                }*/
+                    moveCount = 0;
+                }
                 Thread.sleep(1);
                 if(floors[ii].getCells()[x][y].getRed() == 112){
                     floors[ii].setPassed(true);
@@ -430,6 +229,45 @@ public class Main {
                 }
             } while (floors[ii].getPassed() == false);
 
+        }
+    }
+    public static void catchItem(MiniDungeonGUI gui, Player player, int x, int y, int ii, Floor[] floors){
+        Cell location = floors[ii].getCells()[x][y];
+        if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
+            floors[ii].getItems()[location.getItemId()].setTaken(true);
+            gui.md_setSpriteVisible((location.getItemId()), false);
+            String item_name = floors[ii].getItems()[location.getItemId()].getName();
+            switch (item_name){
+                case "Sword":
+                    player.setPower(player.getPower()+1);
+                    gui.md_setTextStrength(player.getPower());
+                    break;
+                case "Heart":
+                    player.setMaxHealth(player.getMaxHealth()+5);
+                    gui.md_setTextHealthMax(player.getMaxHealth());
+                    gui.md_setTextHealthCurrent(player.getHealth());
+                    break;
+                case "Eye":
+                    player.setPerception(player.getPerception()+1);
+                    gui.md_setTextPerception(player.getPerception());
+                    break;
+                case "Potion":
+                    if(player.getHealth() <= (player.getMaxHealth()-10)){
+                        player.setHealth(player.getHealth() + 10);
+                    } else {
+                        player.setHealth(player.getHealth() + (player.getMaxHealth() - player.getHealth()));
+                    }
+                    gui.md_setTextHealthCurrent(player.getHealth());
+                    break;
+                case "Gold":
+                    player.setGold(player.getGold() + ((int)(Math.random()*901 + 100)));
+                    gui.md_setTextGold(player.getGold());
+                    break;
+                case "Apple":
+                    player.setFood(player.getFood() + ((int)(Math.random()*141 + 40)));
+                    gui.md_setTextFood(player.getFood());
+                    break;
+            }
         }
     }
     public static void paintCells(int x, int y, MiniDungeonGUI gui, Floor[] floors, int ii){

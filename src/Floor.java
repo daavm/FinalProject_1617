@@ -3,6 +3,7 @@ public class Floor {
     private Cell[][] cells = new Cell[50][50];
     private Item[] items = new Item[40];
     private Enemy[] enemies = new Enemy[10];
+    private Room[] rooms = new Room[(int)Math.random()*5+6];
     private boolean passed = false, eye;
 
     Floor(int number) {
@@ -12,6 +13,20 @@ public class Floor {
                 cells[ii][jj] = new Cell();
             }
         }
+        for(int ii = 0; ii < rooms.length; ii++){
+            rooms[ii] = new Room();
+        }
+        for(int ii = 0; ii < rooms.length; ii++){
+            int x = rooms[ii].getOriginX(), y = rooms[ii].getOriginY();
+            for(int kk = 0; kk < 5; kk++) {
+                for (int jj = 0; jj < 5; jj++) {
+                    if (x + kk < 50 && y + jj < 50) {
+                        setCellsTrue((x + kk), (y + jj));
+                    }
+                }
+            }
+        }
+        setCellsTrue(getStartX(), getStartY());
         int eyeIf = (int)(Math.random()*2);
         switch (eyeIf){
             case 0: eye = true;
@@ -19,8 +34,8 @@ public class Floor {
             case 1: eye = false;
                 break;
         }
-
-       /* for (int xx = 9; xx < 14; xx++) {
+        setCellsTrue(getStartX(), getStartY());
+     /*   for (int xx = 9; xx < 14; xx++) {
             for (int yy = 4; yy < 8; yy++) { //Code to create rooms and corridors
                 setCellsTrue(xx, yy);
             }
@@ -37,15 +52,15 @@ public class Floor {
             int yy = 4;
             setCellsTrue(yy, xx);
         }
-
+*/
         for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
-        }*/
+        }/*
        int x = (int)(Math.random()*30), y = (int)(Math.random()*30);
         int lastDirection = 1; //let's just start with north- 1:north 2: South 3: East 4: west
-        for(int ii = 0; ii < 150; ii++) {
+        for(int ii = 0; ii < 50; ii++) {
             int roomCorridor =  1;//(int)(Math.random()*7); //0-6 corridor, 7 room
             if(roomCorridor == 7){ //ROOM
                 int height = (int)(Math.random()*6+1);
@@ -108,30 +123,38 @@ public class Floor {
                             y = y+1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
+                            } else {
+                                y = y -1;
                             }
                             break;
                         case 1:
                             y = y-1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
+                            } else {
+                                y = y+1;
                             }
                             break;
                         case 2:
                             x = x+1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
+                            } else {
+                                x = x-1;
                             }
                             break;
                         case 3:
                             x = x-1;
                             if(y < 50 && y >= 0 && x >= 0 && x < 50){
                                 setCellsTrue(x, y);
+                            } else {
+                                x = x +1 ;
                             }
                             break;
                     }
                 }
             }
-        }
+        }*/
 
         for (int ii = 0; ii < 40; ii++) {
             items[ii] = new Item((int) (Math.random() * 6));

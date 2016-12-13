@@ -1,5 +1,6 @@
 
-public class Player {
+public
+class Player {
 	private int health, maxHealth, power, perception, food, currX, currY, gold;
 	
 	Player(){
