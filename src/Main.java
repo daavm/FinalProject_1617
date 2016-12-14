@@ -3,7 +3,7 @@ import minidungeon.MiniDungeonGUI;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-        Floor[] floors = new Floor[1];
+        Floor[] floors = new Floor[5];
         MiniDungeonGUI gui = new MiniDungeonGUI(50, 50);
         gui.setVisible(true);
         int eyeCount = 0; //eyecount goes here because there can only be 1 eye per 5 levels, and this game has only 5 levels(floors), so will only appear once
@@ -20,6 +20,8 @@ public class Main {
         }
         Player player = new Player();
         for (int ii = 0; ii < floors.length; ii++) {
+            int movements = 0;
+            boolean finish = false;
             //colorize stock board (black)
             for (int kk = 0; kk < 50; kk++) {
                 for (int jj = 0; jj < 50; jj++) {
@@ -32,14 +34,18 @@ public class Main {
                 }
             }
 
-
-            //if(floor.isPassed()){
-
-
-
+            //RE-EXPLORE
+            if(floors[ii].getExplored()) {
+                for(int jj = 0; jj < 50; jj++){
+                    for(int kk = 0; kk <50; kk++){
+                        if(floors[ii].getCells()[jj][kk].getExplored()){
+                            gui.md_setSquareColor(jj, kk, floors[ii].getCells()[jj][kk].getRed(), floors[ii].getCells()[jj][kk].getGreen(), floors[ii].getCells()[jj][kk].getBlue());
+                        }
+                    }
+                }
+            }
             //show alive enemies, onthefloor items,etc...
             //seeing first if the boss is killed so the floor is explored...etc floor.isExplored() <-- add
-            //Generate valid start coordinates
 
             for (int x1 = 1; x1 > 0; x1++) {
                 floors[ii].setTrapdoorX((int) (Math.random() * 50));
@@ -67,38 +73,27 @@ public class Main {
             }
             //ITEMS GENERATION
             int id_count = 1;
-            for (int jj = 2; jj < 10; jj++) { //number of items to generate
+            for (int jj = 2; jj < 30; jj++) { //number of items to generate
                 int swordCount = 0, heartCount = 0;
                 id_count++;
                 if(generateItems(gui, floors, ii, jj, id_count, eyeCount)==1) {
                     eyeCount++;
                 }
-
-
-/*
-                floors[ii].getItems()[jj].setId(jj);
-                for (int x1 = 1; x1 > 0; x1++) {
-                    int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
-                    if (floors[ii].getCells()[Ix][Iy].getWall() && !floors[ii].getCells()[Ix][Iy].getHaveItem() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
-                        x1 = -1;
-                        gui.md_moveSprite(id_count, Ix, Iy);
-                        floors[ii].getCells()[Ix][Iy].setHaveItem(true);
-                        floors[ii].getCells()[Ix][Iy].setItemId(jj);
-                    }
-                }
                 //TODO only to test maps
-*/
                 gui.md_setSpriteVisible(id_count, true);
-
             }
             id_count++;
             for (int jj = 0; jj < 10; jj++){
                 generateEnemies(gui, floors, ii, jj, id_count);
                 id_count++;
-
             }
             gui.md_setSquareColor(floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY(), 23, 43, 75);
             int x = floors[ii].getStartX(), y = floors[ii].getStartY();
+            if(ii > 0){
+                floors[ii].getCells()[x][y].setRed(198);
+                floors[ii].getCells()[x][y].setGreen(103);
+                floors[ii].getCells()[x][y].setBlue(190);
+            }
             gui.md_setTextFood(player.getFood());
             gui.md_setTextHealthCurrent(player.getHealth());
             gui.md_setTextFloor(-ii);
@@ -112,12 +107,13 @@ public class Main {
             gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
 
             //paint start coordinates
-            gui.md_setSquareColor(x, y, (int)floors[ii].getCells()[x][y].getRed(), (int)floors[ii].getCells()[x][y].getGreen(), (int)floors[ii].getCells()[x][y].getBlue());
+            gui.md_setSquareColor(x, y, floors[ii].getCells()[x][y].getRed(), floors[ii].getCells()[x][y].getGreen(), floors[ii].getCells()[x][y].getBlue());
 
 
 
             //MOVE
-            int moveCount = 0;
+            int moveCount = 749;
+            int floorNumber;
             do {
                 String lastAction = gui.md_getLastAction().toLowerCase();
 
@@ -128,6 +124,7 @@ public class Main {
                         x--;
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
+                        movements++;
                     }
                 } else if (lastAction.equals("right") && (x+1) < 50) {
                     catchItem(gui, player, (x+1), y, ii, floors);
@@ -136,6 +133,7 @@ public class Main {
                         x++;
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
+                        movements++;
                     }
                 } else if (lastAction.equals("up") && (y-1) >= 0) {
                     catchItem(gui, player, x, (y-1), ii, floors);
@@ -144,6 +142,7 @@ public class Main {
                         y--;
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
+                        movements++;
                     }
                 } else if (lastAction.equals("down") && (y+1) < 50) {
                     catchItem(gui, player, x, (y+1), ii, floors);
@@ -153,6 +152,7 @@ public class Main {
                         y++;
                         player.setFood((player.getFood() - 1));
                         gui.md_setTextFood(player.getFood());
+                        movements++;
                     }
                 }
                 //Show and set cells explored by perception
@@ -186,7 +186,7 @@ public class Main {
                         paintCells(x+1, y-1, gui, floors, ii);
                     }
                     if(x - 1 >= 0 && y + 1 <= 49) {
-                        paintCells(x-1, y-1, gui, floors, ii);
+                        paintCells(x-1, y+1, gui, floors, ii);
 
                     }
                     if(x + 1 <= 49 && y + 1 <= 49) {
@@ -196,38 +196,50 @@ public class Main {
                 moveCount++;
                 if(moveCount == 750) {
                     for (int kk = 0; kk < 10; kk++) { //TODO MOVE ENEMIES
-
                         int move = (int) (Math.random() * 4);
-                        if (move == 0) {
-                            gui.md_moveSprite(kk + 10,
-                                    floors[ii].getEnemies()[kk].getX() + 1,
-                                    floors[ii].getEnemies()[kk].getY());
-                            floors[ii].getEnemies()[kk].setX(floors[ii].getEnemies()[kk].getX() + 1);
-                        } else if (move == 1) {
-                            gui.md_moveSprite(kk + 10,
-                                    floors[ii].getEnemies()[kk].getX() - 1,
-                                    floors[ii].getEnemies()[kk].getY());
-                            floors[ii].getEnemies()[kk].setX(floors[ii].getEnemies()[kk].getX() - 1);
-                        } else if (move == 2) {
-                            gui.md_moveSprite(kk + 10,
-                                    floors[ii].getEnemies()[kk].getX(),
-                                    floors[ii].getEnemies()[kk].getY() + 1);
-                            floors[ii].getEnemies()[kk].setY(floors[ii].getEnemies()[kk].getY() + 1);
-                        } else if (move == 3) {
-                            gui.md_moveSprite(kk + 10,
-                                    floors[ii].getEnemies()[kk].getX(),
-                                    floors[ii].getEnemies()[kk].getY() - 1);
-                            floors[ii].getEnemies()[kk].setY(floors[ii].getEnemies()[kk].getY() - 1);
+                        int enemX = floors[ii].getEnemies()[kk].getX(), enemY = floors[ii].getEnemies()[kk].getY();
+                        if (move == 0 && (enemX + 1) >= 0 && (enemX+1) < 50 && floors[ii].getCells()[enemX+1][enemY].getWall()) {
+                            gui.md_moveSprite(kk + 30,
+                                    (enemX + 1),
+                                    (enemY));
+                            floors[ii].getEnemies()[kk].setX((floors[ii].getEnemies()[kk].getX() + 1));
+                        } else if (move == 1 && (enemX - 1) >= 0 && (enemX - 1) < 50 && floors[ii].getCells()[enemX-1][enemY].getWall()) {
+                            gui.md_moveSprite(kk + 30,
+                                    (enemX - 1),
+                                    enemY);
+                            floors[ii].getEnemies()[kk].setX((floors[ii].getEnemies()[kk].getX() - 1));
+                        } else if (move == 2 && enemY+1 >= 0 && enemY+1 < 50 && floors[ii].getCells()[enemX][enemY+1].getWall()) {
+                            gui.md_moveSprite(kk + 30,
+                                    enemX,
+                                    (enemY + 1));
+                            floors[ii].getEnemies()[kk].setY((floors[ii].getEnemies()[kk].getY() + 1));
+                        } else if (move == 3 && enemY-1 >= 0 && enemY-1 < 50&& floors[ii].getCells()[enemX][enemY-1].getWall()) {
+                            gui.md_moveSprite(kk + 30,
+                                    enemX,
+                                    (enemY - 1));
+                            floors[ii].getEnemies()[kk].setY((floors[ii].getEnemies()[kk].getY() - 1));
                         }
                     }
                     moveCount = 0;
                 }
                 Thread.sleep(1);
-                if(floors[ii].getCells()[x][y].getRed() == 112){
+                floorNumber = ii;
+                if(floors[ii].getCells()[x][y].getRed() == 112 && movements > 0){
                     floors[ii].setPassed(true);
-                    gui.md_clearSprites();
+                    floors[ii].setExplored(true);
+                    for(int jj = 2; jj < 10; jj++){
+                        gui.md_setSpriteVisible(jj, false);
+                    }
+                } else if(floors[ii].getCells()[x][y].getRed() == 198 && movements > 0){
+
+                    finish = true;
+                    floors[ii-1].setPassed(false);
+                    ii -= 2;
+                    for(int jj = 2; jj < 10; jj++){
+                        gui.md_setSpriteVisible(jj, false);
+                    }
                 }
-            } while (floors[ii].getPassed() == false);
+            } while (!floors[floorNumber].isPassed() && !finish);
 
         }
     }
@@ -373,20 +385,18 @@ public class Main {
                 floors[ii].getCells()[Ix][Iy].setItemId(jj);
             }
         }
-        //TODO only to test maps
-//                gui.md_setSpriteVisible(id_count, true);
         return returned;
     }
     public static void generateEnemies(MiniDungeonGUI gui, Floor[] floors, int ii, int jj, int id_count){
         String enemy = floors[ii].getEnemies()[jj].getName();
         gui.md_addSprite(id_count, enemy, true);
-        gui.md_setSpriteVisible(id_count, true);
+       gui.md_setSpriteVisible(id_count, true);
         for (int x1 = 1; x1 > 0; x1++) {
             int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
             if (floors[ii].getCells()[Ix][Iy].getWall() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
                 x1 = -1;
-                floors[ii].getEnemies()[ii].setX(Ix);
-                floors[ii].getEnemies()[ii].setY(Iy);
+                floors[ii].getEnemies()[jj].setX(Ix);
+                floors[ii].getEnemies()[jj].setY(Iy);
                 gui.md_moveSprite(id_count, Ix, Iy);
             }
         }
