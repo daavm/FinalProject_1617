@@ -5,6 +5,7 @@ public class Cell {
     private boolean explored, wall, haveItem; //wall means it's actually NOT wall TODO change name ¬¬
     private int itemId;
     private long red, green, blue;
+    private boolean room, corridor;
 
     Cell(){
         this.red = 112;
@@ -21,11 +22,20 @@ public class Cell {
     public boolean getWall(){
         return wall;
     }
+    public boolean getRoom(){ return room;}
+    public boolean getCorridor(){ return corridor;}
     public int getRed(){return (int)red;};
     public int getGreen(){return (int)green;};
     public int getBlue(){return (int)blue;};
     public int getItemId(){
         return itemId;
+    }
+
+    public void setRoom(boolean room){
+        this.room = room;
+    }
+    public void setCorridor(boolean corridor){
+        this.corridor = corridor;
     }
     public void setItemId(int Id){
         this.itemId = Id;

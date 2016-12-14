@@ -26,8 +26,15 @@ public class Main {
             for (int kk = 0; kk < 50; kk++) {
                 for (int jj = 0; jj < 50; jj++) {
                     Cell location = floors[ii].getCells()[kk][jj];
+
                     if (floors[ii].getCells()[kk][jj].getExplored()) {
-                        gui.md_setSquareColor(kk, jj, location.getRed(), location.getGreen(), location.getBlue());
+                        if(floors[ii].getCells()[kk][jj].getRoom() & floors[ii].getCells()[kk][jj].getCorridor()){
+                            gui.md_setSquareColor(kk, jj, 2, 216, 12);
+
+                        } else {
+                            gui.md_setSquareColor(kk, jj, location.getRed(), location.getGreen(), location.getBlue());
+                        }
+                        ;
                     } else {
                         gui.md_setSquareColor(kk, jj, 64, 64, 64);
                     }
@@ -290,6 +297,11 @@ public class Main {
             } else {
                 gui.md_setSquareColor(x, y, loc.getRed(), loc.getGreen(), loc.getBlue());
             }
+            if(loc.getRoom() & loc.getCorridor()){
+                gui.md_setSquareColor(x, y, 2, 216, 12);
+
+            }
+            loc.setExplored(true);
         }
     }
     public static void paintPerception(int x, int y, MiniDungeonGUI gui, Floor[] floors, int ii){
@@ -299,6 +311,10 @@ public class Main {
                 gui.md_setSquareColor(x, (y), location.getRed(), location.getGreen(), location.getBlue());
             } else {
                 gui.md_setSquareColor(x, (y), 112, 112, 112);
+            }
+            if(location.getRoom() && location.getCorridor()){
+                gui.md_setSquareColor(x, y, 2, 216, 12);
+
             }
             location.setExplored(true);
             if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {

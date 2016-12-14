@@ -22,6 +22,18 @@ public class Floor {
                 for (int jj = 0; jj < rooms[ii].getBase(); jj++) {
                     if (x + kk < 50 && y + jj < 50) {
                         setCellsTrue((x + kk), (y + jj));
+                        if(x-1 >= 0){
+                            cells[(x-1)][(jj)].setRoom(true);
+                        }
+                        if(x+rooms[ii].getBase() < 50){
+                            cells[(x+rooms[ii].getBase())][(jj)].setRoom(true);
+                        }
+                        if(y-1 >= 0){
+                            cells[kk][(y-1)].setRoom(true);
+                        }
+                        if(y+rooms[ii].getHeight() < 50){
+                            cells[kk][(y + rooms[ii].getHeight())].setRoom(true);
+                        }
                     }
                 }
             }
@@ -34,11 +46,11 @@ public class Floor {
                 break;
         }
 
-       /* for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
+        for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
-        }*/
+        }
 
         for(int ii = 0; ii < rooms.length; ii++){
             int x = 0, y = 0;
@@ -52,15 +64,19 @@ public class Floor {
                     }
                 }
 
-                x = (rooms[ii].getOriginX()+addX);
+                x = (rooms[ii].getOriginX()+addX);//TODO use these for corridors entry (+height/base and -1/+1)
                 y = (rooms[ii].getOriginY()+addY);
                 if(x >= 0 && x <50 && y >= 0 && y < 50){
                     jj = -1;
                 }
             }
+
             for(int jj = 0; jj < 50; jj++){
                 setCellsTrue(jj, y);
                 setCellsTrue(x, jj);
+                cells[jj][(y)].setCorridor(true);
+                cells[x][(jj)].setCorridor(true);
+
             }
         }
 
