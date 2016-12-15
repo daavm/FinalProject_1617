@@ -48,11 +48,11 @@ public class Floor {
                 break;
         }
 
-   /*    for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
+      for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
-        }*/
+        }
 
         for (int ii = 0; ii < rooms.length; ii++) {
             int x = 0, y = 0;

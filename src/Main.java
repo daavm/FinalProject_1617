@@ -146,12 +146,48 @@ public class Main {
             int floorNumber;
             do {
                 String lastAction = gui.md_getLastAction().toLowerCase();
-
                 //Move player 'sprite' depending on last action (left, right, up or down)
                 if (lastAction.equals("left") && (x-1) >= 0) {
-                    catchItem(gui, player, (x-1), y, ii, floors);
-                    if (x > 0 && floors[ii].getCells()[x - 1][y].getWall()) {
-                        gui.md_moveSprite(1, (x - 1), y);
+                    catchItem(gui, player, x-1, y, ii, floors);
+                    if(thereIsEnemy(gui, floors, ii, (x-1), y) != -1){
+                        Enemy enemy = floors[ii].getEnemies()[thereIsEnemy(gui, floors, ii, x-1, y)];
+                        if(enemy.getHealth() > 0) {
+                            enemy.setHealth((enemy.getHealth() - player.getPower()));
+                            gui.md_println("Enemy loses " + 1 + "health (" + enemy.getHealth() + ")");
+                            if (enemy.getHealth() <= 0) {
+                                //  gui.md_setSpriteVisible(enemy.getId());
+                                gui.md_setSpriteVisible(id_count, false);
+                                gui.md_setSpriteVisible(enemy.getId(), false);
+                                gui.md_setSquareImage(enemy.getX(), enemy.getY(), "bones.png");
+                            } else {
+                                int attack = (int) (Math.random()*25 + 1);
+                                switch (attack) {
+                                    case 1:
+                                        player.setHealth(player.getHealth() - enemy.getPower());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        } else if (x > 0 && floors[ii].getCells()[x-1][y].getWall()) {
+                            gui.md_moveSprite(1, x-1, y);
+                            x--;
+                            if(player.getFood() != 0){
+                                player.setFood((player.getFood() - 1));
+                                if(player.getFood() <= 0){
+                                    player.setFood(0);
+                                    player.setPower(player.getPower()/2);
+                                    player.setPerception(player.getPerception()/2);
+                                    if(player.getPerception() == 0){
+                                        player.setPerception(1);
+                                    }
+                                }
+                                setGuiText(gui, player);
+                            }
+                            movements++;
+                        }
+                    } else if (x > 0 && floors[ii].getCells()[x-1][y].getWall()) {
+                        gui.md_moveSprite(1, (x-1), y);
                         x--;
                         if(player.getFood() != 0){
                             player.setFood((player.getFood() - 1));
@@ -168,9 +204,46 @@ public class Main {
                         movements++;
                     }
                 } else if (lastAction.equals("right") && (x+1) < 50) {
-                    catchItem(gui, player, (x+1), y, ii, floors);
-                    if (x < 49 && floors[ii].getCells()[x + 1][y].getWall()) {
-                        gui.md_moveSprite(1, (x + 1), y);
+                    catchItem(gui, player, x+1, y, ii, floors);
+                    if(thereIsEnemy(gui, floors, ii, (x+1), y) != -1){
+                        Enemy enemy = floors[ii].getEnemies()[thereIsEnemy(gui, floors, ii, x+1, y)];
+                        if(enemy.getHealth() > 0) {
+                            enemy.setHealth((enemy.getHealth() - player.getPower()));
+                            gui.md_println("Enemy loses " + 1 + "health (" + enemy.getHealth() + ")");
+                            if (enemy.getHealth() <= 0) {
+                                //  gui.md_setSpriteVisible(enemy.getId());
+                                gui.md_setSpriteVisible(id_count, false);
+                                gui.md_setSpriteVisible(enemy.getId(), false);
+                                gui.md_setSquareImage(enemy.getX(), enemy.getY(), "bones.png");
+                            } else {
+                                int attack = (int) (Math.random()*25 + 1);
+                                switch (attack) {
+                                    case 1:
+                                        player.setHealth(player.getHealth() - enemy.getPower());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        } else if (x > 0 && floors[ii].getCells()[x+1][y].getWall()) {
+                            gui.md_moveSprite(1, x+1, y);
+                            x++;
+                            if(player.getFood() != 0){
+                                player.setFood((player.getFood() - 1));
+                                if(player.getFood() <= 0){
+                                    player.setFood(0);
+                                    player.setPower(player.getPower()/2);
+                                    player.setPerception(player.getPerception()/2);
+                                    if(player.getPerception() == 0){
+                                        player.setPerception(1);
+                                    }
+                                }
+                                setGuiText(gui, player);
+                            }
+                            movements++;
+                        }
+                    } else if (x > 0 && floors[ii].getCells()[x+1][y].getWall()) {
+                        gui.md_moveSprite(1, (x+1), y);
                         x++;
                         if(player.getFood() != 0){
                             player.setFood((player.getFood() - 1));
@@ -187,9 +260,46 @@ public class Main {
                         movements++;
                     }
                 } else if (lastAction.equals("up") && (y-1) >= 0) {
-                    catchItem(gui, player, x, (y-1), ii, floors);
-                    if (y > 0 && floors[ii].getCells()[x][y - 1].getWall()) {
-                        gui.md_moveSprite(1, x, (y - 1));
+                    catchItem(gui, player, x, y-1, ii, floors);
+                    if(thereIsEnemy(gui, floors, ii, x, y-1) != -1){
+                        Enemy enemy = floors[ii].getEnemies()[thereIsEnemy(gui, floors, ii, x, y-1)];
+                        if(enemy.getHealth() > 0) {
+                            enemy.setHealth((enemy.getHealth() - player.getPower()));
+                            gui.md_println("Enemy loses " + 1 + "health (" + enemy.getHealth() + ")");
+                            if (enemy.getHealth() <= 0) {
+                                //  gui.md_setSpriteVisible(enemy.getId());
+                                gui.md_setSpriteVisible(id_count, false);
+                                gui.md_setSpriteVisible(enemy.getId(), false);
+                                gui.md_setSquareImage(enemy.getX(), enemy.getY(), "bones.png");
+                            } else {
+                                int attack = (int) (Math.random()*25 + 1);
+                                switch (attack) {
+                                    case 1:
+                                        player.setHealth(player.getHealth() - enemy.getPower());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        } else if (x > 0 && floors[ii].getCells()[x][y-1].getWall()) {
+                            gui.md_moveSprite(1, x, y-1);
+                            y--;
+                            if(player.getFood() != 0){
+                                player.setFood((player.getFood() - 1));
+                                if(player.getFood() <= 0){
+                                    player.setFood(0);
+                                    player.setPower(player.getPower()/2);
+                                    player.setPerception(player.getPerception()/2);
+                                    if(player.getPerception() == 0){
+                                        player.setPerception(1);
+                                    }
+                                }
+                                setGuiText(gui, player);
+                            }
+                            movements++;
+                        }
+                    } else if (x > 0 && floors[ii].getCells()[x][y-1].getWall()) {
+                        gui.md_moveSprite(1, x, y-1);
                         y--;
                         if(player.getFood() != 0){
                             player.setFood((player.getFood() - 1));
@@ -206,10 +316,46 @@ public class Main {
                         movements++;
                     }
                 } else if (lastAction.equals("down") && (y+1) < 50) {
-                    catchItem(gui, player, x, (y+1), ii, floors);
-                    if (y < 49 && floors[ii].getCells()[x][y + 1].getWall()) {
-                        gui.md_moveSprite(1, x, (y + 1));
-                        gui.md_repaintBoard();
+                    catchItem(gui, player, x, y+1, ii, floors);
+                    if(thereIsEnemy(gui, floors, ii, x, y+1) != -1){
+                        Enemy enemy = floors[ii].getEnemies()[thereIsEnemy(gui, floors, ii, x, y+1)];
+                        if(enemy.getHealth() > 0) {
+                            enemy.setHealth((enemy.getHealth() - player.getPower()));
+                            gui.md_println("Enemy loses " + 1 + "health (" + enemy.getHealth() + ")");
+                            if (enemy.getHealth() <= 0) {
+                                //  gui.md_setSpriteVisible(enemy.getId());
+                                gui.md_setSpriteVisible(id_count, false);
+                                gui.md_setSpriteVisible(enemy.getId(), false);
+                                gui.md_setSquareImage(enemy.getX(), enemy.getY(), "bones.png");
+                            } else {
+                                int attack = (int) (Math.random()*25 + 1);
+                                switch (attack) {
+                                    case 1:
+                                        player.setHealth(player.getHealth() - enemy.getPower());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        } else if (x > 0 && floors[ii].getCells()[x][y+1].getWall()) {
+                            gui.md_moveSprite(1, x, y+1);
+                            y++;
+                            if(player.getFood() != 0){
+                                player.setFood((player.getFood() - 1));
+                                if(player.getFood() <= 0){
+                                    player.setFood(0);
+                                    player.setPower(player.getPower()/2);
+                                    player.setPerception(player.getPerception()/2);
+                                    if(player.getPerception() == 0){
+                                        player.setPerception(1);
+                                    }
+                                }
+                                setGuiText(gui, player);
+                            }
+                            movements++;
+                        }
+                    } else if (x > 0 && floors[ii].getCells()[x][y+1].getWall()) {
+                        gui.md_moveSprite(1, x, y+1);
                         y++;
                         if(player.getFood() != 0){
                             player.setFood((player.getFood() - 1));
@@ -267,26 +413,28 @@ public class Main {
                     for (int kk = 0; kk < 10; kk++) {
                         int move = (int) (Math.random() * 4);
                         int enemX = floors[ii].getEnemies()[kk].getX(), enemY = floors[ii].getEnemies()[kk].getY();
-                        if (move == 0 && (enemX + 1) >= 0 && (enemX+1) < 50 && floors[ii].getCells()[enemX+1][enemY].getWall()) {
-                            gui.md_moveSprite(kk + 30,
-                                    (enemX + 1),
-                                    (enemY));
-                            floors[ii].getEnemies()[kk].setX((floors[ii].getEnemies()[kk].getX() + 1));
-                        } else if (move == 1 && (enemX - 1) >= 0 && (enemX - 1) < 50 && floors[ii].getCells()[enemX-1][enemY].getWall()) {
-                            gui.md_moveSprite(kk + 30,
-                                    (enemX - 1),
-                                    enemY);
-                            floors[ii].getEnemies()[kk].setX((floors[ii].getEnemies()[kk].getX() - 1));
-                        } else if (move == 2 && enemY+1 >= 0 && enemY+1 < 50 && floors[ii].getCells()[enemX][enemY+1].getWall()) {
-                            gui.md_moveSprite(kk + 30,
-                                    enemX,
-                                    (enemY + 1));
-                            floors[ii].getEnemies()[kk].setY((floors[ii].getEnemies()[kk].getY() + 1));
-                        } else if (move == 3 && enemY-1 >= 0 && enemY-1 < 50&& floors[ii].getCells()[enemX][enemY-1].getWall()) {
-                            gui.md_moveSprite(kk + 30,
-                                    enemX,
-                                    (enemY - 1));
-                            floors[ii].getEnemies()[kk].setY((floors[ii].getEnemies()[kk].getY() - 1));
+                        if(floors[ii].getEnemies()[kk].isVisible() && floors[ii].getEnemies()[kk].getHealth() > 0) {
+                            if (move == 0 && (enemX + 1) >= 0 && (enemX + 1) < 50 && floors[ii].getCells()[enemX + 1][enemY].getWall()) {
+                                gui.md_moveSprite(kk + 30,
+                                        (enemX + 1),
+                                        (enemY));
+                                floors[ii].getEnemies()[kk].setX((floors[ii].getEnemies()[kk].getX() + 1));
+                            } else if (move == 1 && (enemX - 1) >= 0 && (enemX - 1) < 50 && floors[ii].getCells()[enemX - 1][enemY].getWall()) {
+                                gui.md_moveSprite(kk + 30,
+                                        (enemX - 1),
+                                        enemY);
+                                floors[ii].getEnemies()[kk].setX((floors[ii].getEnemies()[kk].getX() - 1));
+                            } else if (move == 2 && enemY + 1 >= 0 && enemY + 1 < 50 && floors[ii].getCells()[enemX][enemY + 1].getWall()) {
+                                gui.md_moveSprite(kk + 30,
+                                        enemX,
+                                        (enemY + 1));
+                                floors[ii].getEnemies()[kk].setY((floors[ii].getEnemies()[kk].getY() + 1));
+                            } else if (move == 3 && enemY - 1 >= 0 && enemY - 1 < 50 && floors[ii].getCells()[enemX][enemY - 1].getWall()) {
+                                gui.md_moveSprite(kk + 30,
+                                        enemX,
+                                        (enemY - 1));
+                                floors[ii].getEnemies()[kk].setY((floors[ii].getEnemies()[kk].getY() - 1));
+                            }
                         }
                     }
                     moveCount = 0;
@@ -301,6 +449,7 @@ public class Main {
                 if(floors[ii].getCells()[x][y].getRed() == 112 && movements > 0){
                     floors[ii].setPassed(true);
                     floors[ii].setExplored(true);
+                    gui.md_setSpriteVisible(1, false);
                     //Passed boolean is used only to make the do-while, and explored boolean is to tell the program the player has
                     //  already been in that floor before
                     if(ii < 4) { //If you go further than level 4, you win!
@@ -309,11 +458,13 @@ public class Main {
                     for(int jj = 2; jj < floors[ii].getItems().length; jj++){
                         gui.md_setSpriteVisible(jj, false);
                     }
-                    //Back trapdoor exit 
+                    //Back trapdoor exit
                 } else if(floors[ii].getCells()[x][y].getRed() == 198 && movements > 0){
                     floors[ii].setPassed(true);
+                    gui.md_setSpriteVisible(1, false);
                     //We set previous floor passed state to false in order to make its do-while loop work again
                     floors[ii-1].setPassed(false);
+                    gui.md_repaintBoard();
                     floors[ii].setExplored(true);
                     for(int jj = 2; jj < floors[ii].getItems().length; jj++){
                         gui.md_setSpriteVisible(jj, false);
@@ -481,24 +632,52 @@ public class Main {
     }
     public static void generateEnemies(MiniDungeonGUI gui, Floor[] floors, int ii, int jj, int id_count){
         String enemy = floors[ii].getEnemies()[jj].getName();
-        gui.md_addSprite(id_count, enemy, true);
-       gui.md_setSpriteVisible(id_count, true);
+        if(floors[ii].getEnemies()[jj].isVisible() && floors[ii].getEnemies()[jj].getHealth() > 0){
+            gui.md_addSprite(id_count, enemy, true);
+            gui.md_setSpriteVisible(id_count, true);
+        } else {
+            gui.md_addSprite(id_count, "bones.png", false);
+            gui.md_setSpriteVisible(id_count, false);
+        }
         for (int x1 = 1; x1 > 0; x1++) {
             int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
             if (floors[ii].getCells()[Ix][Iy].getWall() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
                 x1 = -1;
                 floors[ii].getEnemies()[jj].setX(Ix);
                 floors[ii].getEnemies()[jj].setY(Iy);
+                floors[ii].getEnemies()[jj].setId(id_count);
                 gui.md_moveSprite(id_count, Ix, Iy);
             }
         }
     }
     public static void setGuiText(MiniDungeonGUI gui, Player player){
-        gui.md_setTextHealthMax(player.getHealth());
+        gui.md_setTextHealthMax(player.getMaxHealth());
         gui.md_setTextPerception(player.getPerception());
         gui.md_setTextStrength(player.getPower());
         gui.md_setTextFood(player.getFood());
         gui.md_setTextHealthCurrent(player.getHealth());
+    }
+    public static int thereIsEnemy(MiniDungeonGUI gui, Floor[] floors, int ii, int x, int y){
+        int enemy = -1;
+
+        for (int jj = 0; jj < 10; jj++) {
+            if(floors[ii].getEnemies()[jj].getX() == x && floors[ii].getEnemies()[jj].getY() == y){
+                enemy = jj;
+            }
+        }
+
+        return enemy;
+    }
+    public static int[] doEnemy(MiniDungeonGUI gui, Player player, Floor[] floors, int x, int y, int ii, int id_count, int movements){
+        int[] addings = new int[2];
+        addings[0] = 0; //Array to add 1 to movements in main method
+        addings[1] = 0; //Add 1 to x or y in main method
+        /////////////////////////////////////
+
+
+
+        /////////////////////////////////////
+        return addings;
     }
 }
 
