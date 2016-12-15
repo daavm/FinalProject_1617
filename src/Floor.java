@@ -1,5 +1,5 @@
 public class Floor {
-    private int startX, startY, number, trapdoorX, trapdoorY, heartCount, swordCount;
+    private int startX, startY, number, trapdoorX, trapdoorY, heartCount, swordCount, eyeCount;
     private Cell[][] cells = new Cell[50][50];
     private Item[] items = new Item[40];
     private Enemy[] enemies = new Enemy[10];
@@ -13,72 +13,197 @@ public class Floor {
                 cells[ii][jj] = new Cell();
             }
         }
-        for(int ii = 0; ii < rooms.length; ii++){
+        for (int ii = 0; ii < rooms.length; ii++) {
             rooms[ii] = new Room(rooms, ii);
         }
-        for(int ii = 0; ii < rooms.length; ii++){
+        for (int ii = 0; ii < rooms.length; ii++) {
             int x = rooms[ii].getOriginX(), y = rooms[ii].getOriginY();
-            for(int kk = 0; kk < rooms[ii].getHeight(); kk++) {
+            for (int kk = 0; kk < rooms[ii].getHeight(); kk++) {
                 for (int jj = 0; jj < rooms[ii].getBase(); jj++) {
                     if (x + kk < 50 && y + jj < 50) {
                         setCellsTrue((x + kk), (y + jj));
-                        if(x-1 >= 0){
-                            cells[(x-1)][(jj)].setRoom(true);
+                        if (x - 1 >= 0) {
+                            cells[(x - 1)][(jj)].setRoom(true);
                         }
-                        if(x+rooms[ii].getBase() < 50){
-                            cells[(x+rooms[ii].getBase())][(jj)].setRoom(true);
+                        if (x + rooms[ii].getBase() < 50) {
+                            cells[(x + rooms[ii].getBase())][(jj)].setRoom(true);
                         }
-                        if(y-1 >= 0){
-                            cells[kk][(y-1)].setRoom(true);
+                        if (y - 1 >= 0) {
+                            cells[kk][(y - 1)].setRoom(true);
                         }
-                        if(y+rooms[ii].getHeight() < 50){
+                        if (y + rooms[ii].getHeight() < 50) {
                             cells[kk][(y + rooms[ii].getHeight())].setRoom(true);
                         }
                     }
                 }
             }
         }
-        int eyeIf = (int)(Math.random()*2);
-        switch (eyeIf){
-            case 0: eye = true;
+        int eyeIf = (int) (Math.random() * 2);
+        switch (eyeIf) {
+            case 0:
+                eye = true;
                 break;
-            case 1: eye = false;
+            case 1:
+                eye = false;
                 break;
         }
 
-        for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
+   /*    for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
-        }
+        }*/
 
-        for(int ii = 0; ii < rooms.length; ii++){
+        for (int ii = 0; ii < rooms.length; ii++) {
             int x = 0, y = 0;
-            for(int jj = 1; jj > 0; jj++){
+            for (int jj = 1; jj > 0; jj++) {
                 int addX = 0, addY = 0;
-                for(int kk = 1; kk > 0; kk++){
-                    addX = (int)(Math.random()*5 - 2);
-                    addY = (int)(Math.random()*5 - 2);
-                    if(addX != 0 && addY != 0){
+                for (int kk = 1; kk > 0; kk++) {
+                    addX = (int) (Math.random() * 5 - 2);
+                    addY = (int) (Math.random() * 5 - 2);
+                    if (addX != 0 && addY != 0) {
                         kk = -1;
                     }
                 }
 
-                x = (rooms[ii].getOriginX()+addX);//TODO use these for corridors entry (+height/base and -1/+1)
-                y = (rooms[ii].getOriginY()+addY);
-                if(x >= 0 && x <50 && y >= 0 && y < 50){
+                x = (rooms[ii].getOriginX() + addX);//TODO use these for corridors entry (+height/base and -1/+1)
+                y = (rooms[ii].getOriginY() + addY);
+                if (x >= 0 && x < 50 && y >= 0 && y < 50) {
                     jj = -1;
                 }
             }
 
-            for(int jj = 0; jj < 50; jj++){
+          /*  for(int jj = 0; jj < 50; jj++){
                 setCellsTrue(jj, y);
                 setCellsTrue(x, jj);
                 cells[jj][(y)].setCorridor(true);
                 cells[x][(jj)].setCorridor(true);
 
-            }
+            }*/
+          for(int cc = 0; cc < rooms.length; cc++){
+              rooms[cc].getNearestRoom(rooms);
+              int nearest = 0;
+              if(cc != 0){ nearest = cc-1;} else {
+                  nearest = cc+2;
+              }
+              int finalX = 0;
+              if (rooms[nearest].getOriginX() > rooms[cc].getOriginX() && rooms[nearest].getOriginY() > rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj <= rooms[nearest].getOriginX(); jj++){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk <= rooms[nearest].getOriginY(); kk++){
+                      setCellsTrue(finalX,kk);
+                  }
+
+              } else if (rooms[nearest].getOriginX() > rooms[cc].getOriginX() && rooms[nearest].getOriginY() < rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj <= rooms[nearest].getOriginX(); jj++){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk >= rooms[nearest].getOriginY(); kk--){
+                      setCellsTrue(finalX,kk);
+                  }
+              } else if (rooms[nearest].getOriginX() < rooms[cc].getOriginX() && rooms[nearest].getOriginY() > rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj >= rooms[nearest].getOriginX(); jj--){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk <= rooms[nearest].getOriginY(); kk++){
+                      setCellsTrue(finalX,kk);
+                  }
+              } else if (rooms[nearest].getOriginX() < rooms[cc].getOriginX() && rooms[nearest].getOriginY() < rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj >= rooms[nearest].getOriginX(); jj--){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk >= rooms[nearest].getOriginY(); kk--){
+                      setCellsTrue(finalX,kk);
+                  }
+              }
+              if(cc != (rooms.length-1)){
+                  nearest = cc+1;
+              } else {
+                  nearest = cc-2;
+              }
+              finalX = 0;
+              if (rooms[nearest].getOriginX() > rooms[cc].getOriginX() && rooms[nearest].getOriginY() > rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj <= rooms[nearest].getOriginX(); jj++){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk <= rooms[nearest].getOriginY(); kk++){
+                      setCellsTrue(finalX,kk);
+                  }
+
+              } else if (rooms[nearest].getOriginX() > rooms[cc].getOriginX() && rooms[nearest].getOriginY() < rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj <= rooms[nearest].getOriginX(); jj++){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk >= rooms[nearest].getOriginY(); kk--){
+                      setCellsTrue(finalX,kk);
+                  }
+              } else if (rooms[nearest].getOriginX() < rooms[cc].getOriginX() && rooms[nearest].getOriginY() > rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj >= rooms[nearest].getOriginX(); jj--){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk <= rooms[nearest].getOriginY(); kk++){
+                      setCellsTrue(finalX,kk);
+                  }
+              } else if (rooms[nearest].getOriginX() < rooms[cc].getOriginX() && rooms[nearest].getOriginY() < rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj >= rooms[nearest].getOriginX(); jj--){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk >= rooms[nearest].getOriginY(); kk--){
+                      setCellsTrue(finalX,kk);
+                  }
+              }
+              if(cc != (rooms.length-1) && cc != (rooms.length-2)){
+                  nearest = cc+2;
+              } else {
+                  nearest = cc-3;
+              }
+              finalX = 0;
+              if (rooms[nearest].getOriginX() > rooms[cc].getOriginX() && rooms[nearest].getOriginY() > rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj <= rooms[nearest].getOriginX(); jj++){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk <= rooms[nearest].getOriginY(); kk++){
+                      setCellsTrue(finalX,kk);
+                  }
+
+              } else if (rooms[nearest].getOriginX() > rooms[cc].getOriginX() && rooms[nearest].getOriginY() < rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj <= rooms[nearest].getOriginX(); jj++){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk >= rooms[nearest].getOriginY(); kk--){
+                      setCellsTrue(finalX,kk);
+                  }
+              } else if (rooms[nearest].getOriginX() < rooms[cc].getOriginX() && rooms[nearest].getOriginY() > rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj >= rooms[nearest].getOriginX(); jj--){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk <= rooms[nearest].getOriginY(); kk++){
+                      setCellsTrue(finalX,kk);
+                  }
+              } else if (rooms[nearest].getOriginX() < rooms[cc].getOriginX() && rooms[nearest].getOriginY() < rooms[cc].getOriginY()) {
+                  for(int jj = rooms[cc].getOriginX(); jj >= rooms[nearest].getOriginX(); jj--){
+                      setCellsTrue(jj, rooms[cc].getOriginY());
+                      finalX = jj;
+                  }
+                  for(int kk = rooms[cc].getOriginY(); kk >= rooms[nearest].getOriginY(); kk--){
+                      setCellsTrue(finalX,kk);
+                  }
+              }
+          }
         }
+
 
         for (int ii = 0; ii < 40; ii++) {
             items[ii] = new Item((int) (Math.random() * 6));
@@ -119,9 +244,6 @@ public class Floor {
     public int getStartX() {
         return startX;
     }
-    public int getNumber(){
-        return number;
-    }
     public Item[] getItems(){
         return items;
     }
@@ -152,6 +274,15 @@ public class Floor {
     }
     public void setEye(boolean eye){
         this.eye = eye;
+        if(eye == false){
+            eyeCount = 1;
+        }
+    }
+    public int getEyeCount(){
+        return eyeCount;
+    }
+    public void setEyeCount(int eyeCount){
+        this.eyeCount = eyeCount;
     }
     public Cell[][] getCells() {
         return cells;
@@ -159,11 +290,11 @@ public class Floor {
     public void setPassed(boolean passed){
         this.passed =passed;
     }
-	public void setStartX(int startX){
-		this.startX = startX;
-	}
-	public void setStartY(int startY){
-		this.startY = startY;
-	}
+    public void setStartX(int startX){
+        this.startX = startX;
+    }
+    public void setStartY(int startY){
+        this.startY = startY;
+    }
 
 }

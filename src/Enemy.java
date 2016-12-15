@@ -3,16 +3,20 @@
  */
 public class Enemy {
     String name;
-    int health, power, x, y;
+    int health, power, x, y, xDeath, yDeath;
     //power puede ser 1.5
 
     Enemy(int ii){
         switch (ii){
             case 0:
                 this.name = "black-bishop.png";
+                setHealth(20);
+                setPower(1);
                 break;
             case 1:
                 this.name = "blue-king.png";
+                setHealth(30);
+                setPower(3);
                 break;
         }
     }
@@ -32,6 +36,8 @@ public class Enemy {
     public int getY(){
         return y;
     }
+    public int getxDeath(){ return xDeath;}
+    public int getyDeath(){return yDeath;}
 
     public void setX(int x){
         this.x = x;

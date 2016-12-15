@@ -7,8 +7,17 @@ public class Main {
         MiniDungeonGUI gui = new MiniDungeonGUI(50, 50);
         gui.setVisible(true);
         int eyeCount = 0; //eyecount goes here because there can only be 1 eye per 5 levels, and this game has only 5 levels(floors), so will only appear once
+
+        //Choose which floor containt an eye.
+        int hasEye = (int)(Math.random()*5);
+        System.out.println(hasEye);
         for (int ii = 0; ii < floors.length; ii++) {
             floors[ii] = new Floor(ii);
+            if(ii == hasEye){
+                floors[ii].setEye(true);
+            } else {
+                floors[ii].setEye(false);
+            }
             for (int x1 = 1; x1 > 0; x1++) { //set start coordinates
                 floors[ii].setStartX((int) (Math.random() * 50));
                 floors[ii].setStartY((int) (Math.random() * 50));
@@ -18,30 +27,36 @@ public class Main {
             }
             floors[ii].getCells()[floors[ii].getStartX()][floors[ii].getStartY()].setWall(true);
         }
+
+        //Create player
         Player player = new Player();
+
+        //Game starts here
         for (int ii = 0; ii < floors.length; ii++) {
+            gui.md_setTextFloor(-ii);
             int movements = 0;
             boolean finish = false;
-            //colorize stock board (black)
+
+            //Check if the current floor contains an eye. If it doesn't, put eyeCount on 1, so no eyes are generated
+            if(!floors[ii].getEye()){
+                eyeCount = 1;
+            }
+
+            //Color stock board, checking which cells have already been explored and which not
             for (int kk = 0; kk < 50; kk++) {
                 for (int jj = 0; jj < 50; jj++) {
                     Cell location = floors[ii].getCells()[kk][jj];
 
                     if (floors[ii].getCells()[kk][jj].getExplored()) {
-                        if(floors[ii].getCells()[kk][jj].getRoom() & floors[ii].getCells()[kk][jj].getCorridor()){
-                            gui.md_setSquareColor(kk, jj, 2, 216, 12);
-
-                        } else {
                             gui.md_setSquareColor(kk, jj, location.getRed(), location.getGreen(), location.getBlue());
-                        }
-                        ;
+
                     } else {
                         gui.md_setSquareColor(kk, jj, 64, 64, 64);
                     }
                 }
             }
 
-            //RE-EXPLORE
+            //RE-EXPLORE a floor, when going back to it through a 'back trapdoor'
             if(floors[ii].getExplored()) {
                 for(int jj = 0; jj < 50; jj++){
                     for(int kk = 0; kk <50; kk++){
@@ -50,68 +65,76 @@ public class Main {
                         }
                     }
                 }
-            }
-            //show alive enemies, onthefloor items,etc...
-            //seeing first if the boss is killed so the floor is explored...etc floor.isExplored() <-- add
-
-            for (int x1 = 1; x1 > 0; x1++) {
-                floors[ii].setTrapdoorX((int) (Math.random() * 50));
-                floors[ii].setTrapdoorY((int) (Math.random() * 50));
-                if (floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].getWall() && floors[ii].getTrapdoorX() != floors[ii].getStartX() ) {
-                    x1 = -1;
-                    floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].setRed(112);
-                    floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].setGreen(65);
-                    floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].setBlue(34);
+            } else{
+                for (int x1 = 1; x1 > 0; x1++) {
+                    floors[ii].setTrapdoorX((int) (Math.random() * 50));
+                    floors[ii].setTrapdoorY((int) (Math.random() * 50));
+                    if (floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].getWall() && floors[ii].getTrapdoorX() != floors[ii].getStartX() ) {
+                        x1 = -1;
+                        floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].setRed(112);
+                        floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].setGreen(65);
+                        floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()].setBlue(34);
+                    }
                 }
             }
 
-            //Decide if a floor has an Eye item or not
-            int countEye;
-            if ((ii - 4) >= 0) {
-                countEye = (ii - 4);
-            } else {
-                countEye = 0;
-            }
-            for (int kk = countEye; kk < ii; kk++) {
-                if (floors[kk].getEye()) {
-                    floors[ii].setEye(false);
-                    kk += ii;
-                }
-            }
             //ITEMS GENERATION
             int id_count = 1;
-            for (int jj = 2; jj < 30; jj++) { //number of items to generate
-                int swordCount = 0, heartCount = 0;
-                id_count++;
-                if(generateItems(gui, floors, ii, jj, id_count, eyeCount)==1) {
-                    eyeCount++;
+                for (int jj = 2; jj < 30; jj++) { //number of items to generate
+                    id_count++;
+
+                      //if(!floors[ii].getExplored()) {
+
+                        if (generateItems(gui, floors, ii, jj, id_count, eyeCount) != 0) {
+                        eyeCount++;
+                    //}
+                    }
+                    //move every item to its position, even if it is still invisible
+                    gui.md_moveSprite(id_count, floors[ii].getItems()[jj].getX(),floors[ii].getItems()[jj].getY());
+                    //TODO only to test maps
+                 /* if(!floors[ii].getItems()[jj].getTaken()){
+                        gui.md_setSpriteVisible(id_count, true);
+                    }
+                    gui.md_moveSprite(id_count, floors[ii].getItems()[jj].getX(),floors[ii].getItems()[jj].getY());
+                   */
+                    gui.md_setSquareColor(floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY(), 23, 43, 75);
+                    if(floors[ii].getItems()[jj].getSeen() && !floors[ii].getItems()[jj].getTaken()){
+                        gui.md_setSpriteVisible(id_count, true);
+                        gui.md_moveSprite(id_count, floors[ii].getItems()[id_count].getX(), floors[ii].getItems()[id_count].getY());
+                    }
                 }
-                //TODO only to test maps
-                gui.md_setSpriteVisible(id_count, true);
-            }
+
             id_count++;
             for (int jj = 0; jj < 10; jj++){
                 generateEnemies(gui, floors, ii, jj, id_count);
                 id_count++;
             }
-            gui.md_setSquareColor(floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY(), 23, 43, 75);
             int x = floors[ii].getStartX(), y = floors[ii].getStartY();
+
+            //Color start cell for floors 2nd to 5th. It's also the back trapdoor, as it's where it appears when going through the
+            //  previous floor's trapdoor
             if(ii > 0){
                 floors[ii].getCells()[x][y].setRed(198);
                 floors[ii].getCells()[x][y].setGreen(103);
                 floors[ii].getCells()[x][y].setBlue(190);
             }
-            gui.md_setTextFood(player.getFood());
-            gui.md_setTextHealthCurrent(player.getHealth());
-            gui.md_setTextFloor(-ii);
-            gui.md_setTextHealthMax(player.getHealth());
-            gui.md_setTextPerception(player.getPerception());
-            gui.md_setTextStrength(player.getPower());
+
+
             //sprite of the player generated
             gui.md_addSprite(1, "white-queen.png", true);
             gui.md_setSpriteVisible(1, true);
+            if(floors[ii].getExplored()){
+               if(ii == 0){
+                   gui.md_moveSprite(1, floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY());
+                   x = floors[ii].getTrapdoorX();
+                   y = floors[ii].getTrapdoorY();
+               } else {
+                   gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
+               }
 
-            gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
+            } else {
+                gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
+            }
 
             //paint start coordinates
             gui.md_setSquareColor(x, y, floors[ii].getCells()[x][y].getRed(), floors[ii].getCells()[x][y].getGreen(), floors[ii].getCells()[x][y].getBlue());
@@ -119,18 +142,29 @@ public class Main {
 
 
             //MOVE
-            int moveCount = 749;
+            int moveCount = 449;
             int floorNumber;
             do {
                 String lastAction = gui.md_getLastAction().toLowerCase();
 
+                //Move player 'sprite' depending on last action (left, right, up or down)
                 if (lastAction.equals("left") && (x-1) >= 0) {
                     catchItem(gui, player, (x-1), y, ii, floors);
                     if (x > 0 && floors[ii].getCells()[x - 1][y].getWall()) {
                         gui.md_moveSprite(1, (x - 1), y);
                         x--;
-                        player.setFood((player.getFood() - 1));
-                        gui.md_setTextFood(player.getFood());
+                        if(player.getFood() != 0){
+                            player.setFood((player.getFood() - 1));
+                            if(player.getFood() <= 0){
+                                player.setFood(0);
+                                player.setPower(player.getPower()/2);
+                                player.setPerception(player.getPerception()/2);
+                                if(player.getPerception() == 0){
+                                    player.setPerception(1);
+                                }
+                            }
+                            setGuiText(gui, player);
+                        }
                         movements++;
                     }
                 } else if (lastAction.equals("right") && (x+1) < 50) {
@@ -138,8 +172,18 @@ public class Main {
                     if (x < 49 && floors[ii].getCells()[x + 1][y].getWall()) {
                         gui.md_moveSprite(1, (x + 1), y);
                         x++;
-                        player.setFood((player.getFood() - 1));
-                        gui.md_setTextFood(player.getFood());
+                        if(player.getFood() != 0){
+                            player.setFood((player.getFood() - 1));
+                            if(player.getFood() <= 0){
+                                player.setFood(0);
+                                player.setPower(player.getPower()/2);
+                                player.setPerception(player.getPerception()/2);
+                                if(player.getPerception() == 0){
+                                    player.setPerception(1);
+                                }
+                            }
+                            setGuiText(gui, player);
+                        }
                         movements++;
                     }
                 } else if (lastAction.equals("up") && (y-1) >= 0) {
@@ -147,8 +191,18 @@ public class Main {
                     if (y > 0 && floors[ii].getCells()[x][y - 1].getWall()) {
                         gui.md_moveSprite(1, x, (y - 1));
                         y--;
-                        player.setFood((player.getFood() - 1));
-                        gui.md_setTextFood(player.getFood());
+                        if(player.getFood() != 0){
+                            player.setFood((player.getFood() - 1));
+                            if(player.getFood() <= 0){
+                                player.setFood(0);
+                                player.setPower(player.getPower()/2);
+                                player.setPerception(player.getPerception()/2);
+                                if(player.getPerception() == 0){
+                                    player.setPerception(1);
+                                }
+                            }
+                            setGuiText(gui, player);
+                        }
                         movements++;
                     }
                 } else if (lastAction.equals("down") && (y+1) < 50) {
@@ -157,12 +211,23 @@ public class Main {
                         gui.md_moveSprite(1, x, (y + 1));
                         gui.md_repaintBoard();
                         y++;
-                        player.setFood((player.getFood() - 1));
-                        gui.md_setTextFood(player.getFood());
+                        if(player.getFood() != 0){
+                            player.setFood((player.getFood() - 1));
+                            if(player.getFood() <= 0){
+                                player.setFood(0);
+                                player.setPower(player.getPower()/2);
+                                player.setPerception(player.getPerception()/2);
+                                if(player.getPerception() == 0){
+                                    player.setPerception(1);
+                                }
+                            }
+                            setGuiText(gui, player);
+                        }
                         movements++;
                     }
                 }
-                //Show and set cells explored by perception
+
+                //Show and set cells explored depending on perception
                 if (x + player.getPerception() <= 49) {
                     for(int perception = player.getPerception(); perception > 0; perception -= 1) {
                         paintPerception(x + perception, y, gui, floors, ii);
@@ -183,26 +248,23 @@ public class Main {
                         paintPerception(x, y - perception, gui, floors, ii);
                     }
                 }
-                //paint extra cells when perception is 2
+
+                //Paint extra cells when perception is 2 (maximum in this gamer is perception = 2, as it has 5 levels and
+                //  there can only be 1 eye per 5 levels
                 if(player.getPerception() > 1) {
                     Cell loc = floors[ii].getCells()[x][y];
-                    if(x - 1 >= 0 && y -1 >= 0){
-                        paintCells(x-1, y-1, gui, floors, ii);
-                    }
-                    if(x + 1 <= 49 && y -1 >= 0) {
-                        paintCells(x+1, y-1, gui, floors, ii);
-                    }
-                    if(x - 1 >= 0 && y + 1 <= 49) {
-                        paintCells(x-1, y+1, gui, floors, ii);
-
-                    }
-                    if(x + 1 <= 49 && y + 1 <= 49) {
-                        paintCells(x+1, y+1, gui, floors, ii);
-                    }
+                    paintCells(x-1, y-1, gui, floors, ii);
+                    paintCells(x+1, y-1, gui, floors, ii);
+                    paintCells(x-1, y+1, gui, floors, ii);
+                    paintCells(x+1, y+1, gui, floors, ii);
                 }
+
+                //Used moveCount to move enemies every 450 milliseconds
                 moveCount++;
-                if(moveCount == 750) {
-                    for (int kk = 0; kk < 10; kk++) { //TODO MOVE ENEMIES
+
+                //MOVE ENEMIES
+                if(moveCount == 450) {
+                    for (int kk = 0; kk < 10; kk++) {
                         int move = (int) (Math.random() * 4);
                         int enemX = floors[ii].getEnemies()[kk].getX(), enemY = floors[ii].getEnemies()[kk].getY();
                         if (move == 0 && (enemX + 1) >= 0 && (enemX+1) < 50 && floors[ii].getCells()[enemX+1][enemY].getWall()) {
@@ -230,25 +292,39 @@ public class Main {
                     moveCount = 0;
                 }
                 Thread.sleep(1);
+
+                //When going through a back-trapdoor, we reduce ii variable by '-2', so we save the previous ii value to be able
+                //  to 'close' the floor when exiting the do-while
                 floorNumber = ii;
+
+                //Trapdoor exit
                 if(floors[ii].getCells()[x][y].getRed() == 112 && movements > 0){
                     floors[ii].setPassed(true);
                     floors[ii].setExplored(true);
-                    for(int jj = 2; jj < 10; jj++){
+                    //Passed boolean is used only to make the do-while, and explored boolean is to tell the program the player has
+                    //  already been in that floor before
+                    if(ii < 4) { //If you go further than level 4, you win!
+                        floors[ii + 1].setPassed(false);
+                    }
+                    for(int jj = 2; jj < floors[ii].getItems().length; jj++){
                         gui.md_setSpriteVisible(jj, false);
                     }
+                    //Back trapdoor exit 
                 } else if(floors[ii].getCells()[x][y].getRed() == 198 && movements > 0){
-
-                    finish = true;
+                    floors[ii].setPassed(true);
+                    //We set previous floor passed state to false in order to make its do-while loop work again
                     floors[ii-1].setPassed(false);
-                    ii -= 2;
-                    for(int jj = 2; jj < 10; jj++){
+                    floors[ii].setExplored(true);
+                    for(int jj = 2; jj < floors[ii].getItems().length; jj++){
                         gui.md_setSpriteVisible(jj, false);
                     }
+                    ii -= 2;
                 }
-            } while (!floors[floorNumber].isPassed() && !finish);
+            } while (!floors[floorNumber].isPassed());
 
         }
+        //Message the game shows when the player finishes last level
+        gui.md_showMessageDialog("Congratulations!\nYou reached level 5!\nScore: " + player.getGold() );
     }
     public static void catchItem(MiniDungeonGUI gui, Player player, int x, int y, int ii, Floor[] floors){
         Cell location = floors[ii].getCells()[x][y];
@@ -297,11 +373,8 @@ public class Main {
             } else {
                 gui.md_setSquareColor(x, y, loc.getRed(), loc.getGreen(), loc.getBlue());
             }
-            if(loc.getRoom() & loc.getCorridor()){
-                gui.md_setSquareColor(x, y, 2, 216, 12);
-
-            }
             loc.setExplored(true);
+            floors[ii].getItems()[loc.getItemId()].setSeen(true);
         }
     }
     public static void paintPerception(int x, int y, MiniDungeonGUI gui, Floor[] floors, int ii){
@@ -312,13 +385,10 @@ public class Main {
             } else {
                 gui.md_setSquareColor(x, (y), 112, 112, 112);
             }
-            if(location.getRoom() && location.getCorridor()){
-                gui.md_setSquareColor(x, y, 2, 216, 12);
-
-            }
             location.setExplored(true);
             if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
                 gui.md_setSpriteVisible(location.getItemId(), true);
+                floors[ii].getItems()[location.getItemId()].setSeen(true);
             }
         }
     }
@@ -332,7 +402,7 @@ public class Main {
                 if(!id.equals("Sword")){
                     if(id.equals("Heart") && heartCount == 0){
                         repeated = false;
-                    } else if(id.equals("Eye") && eyeCount == 0){
+                    } else if(id.equals("Eye") && floors[ii].getEyeCount() == 0){
                         repeated = false;
                     } else if(!id.equals("Heart") && !id.equals("Eye")){
                         repeated = false;
@@ -343,18 +413,18 @@ public class Main {
                 if(!id.equals("Heart")){
                     if(id.equals("Sword") && heartCount == 0){
                         repeated = false;
-                    } else if(id.equals("Eye") && eyeCount == 0){
+                    } else if(id.equals("Eye") && floors[ii].getEyeCount() == 0){
                         repeated = false;
                     } else if(!id.equals("Sword") && !id.equals("Eye")){
                         repeated = false;
                     }
                 }
-            } else if(id.equals("Eye") && eyeCount > 0){
+            } else if(id.equals("Eye") && floors[ii].getEyeCount() != 0){
                 id = floors[ii].getNewItem(jj);
                 if(!id.equals("Eye")){
                     if(id.equals("Sword") && heartCount == 0){
                         repeated = false;
-                    } else if(id.equals("Heart") && eyeCount == 0){
+                    } else if(id.equals("Heart") && floors[ii].getHeartCount() == 0){
                         repeated = false;
                     } else if(!id.equals("Sword") && !id.equals("Heart")){
                         repeated = false;
@@ -371,7 +441,7 @@ public class Main {
                 break;
             case "Eye":
                 gui.md_addSprite(id_count, "eye.png", true);
-                returned = 1;
+                floors[ii].setEyeCount(1);
                 break;
             case "Gold":
                 gui.md_addSprite(id_count, "gold.png", true);
@@ -392,14 +462,20 @@ public class Main {
         }
 
         floors[ii].getItems()[jj].setId(jj);
-        for (int x1 = 1; x1 > 0; x1++) {
-            int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
-            if (floors[ii].getCells()[Ix][Iy].getWall() && !floors[ii].getCells()[Ix][Iy].getHaveItem() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
-                x1 = -1;
-                gui.md_moveSprite(id_count, Ix, Iy);
-                floors[ii].getCells()[Ix][Iy].setHaveItem(true);
-                floors[ii].getCells()[Ix][Iy].setItemId(jj);
+        if(!floors[ii].getExplored()) {
+            for (int x1 = 1; x1 > 0; x1++) {
+                int Ix = (int) (Math.random() * 50), Iy = (int) (Math.random() * 50);
+                if (floors[ii].getCells()[Ix][Iy].getWall() && !floors[ii].getCells()[Ix][Iy].getHaveItem() && Ix != floors[ii].getStartX() && Iy != floors[ii].getStartY()) { //activate when having more cells than items created
+                    x1 = -1;
+                    gui.md_moveSprite(id_count, Ix, Iy);
+                    floors[ii].getItems()[jj].setX(Ix);
+                    floors[ii].getItems()[jj].setY(Iy);
+                    floors[ii].getCells()[Ix][Iy].setHaveItem(true);
+                    floors[ii].getCells()[Ix][Iy].setItemId(jj);
+                }
             }
+        } else {
+            gui.md_moveSprite(id_count, floors[ii].getItems()[jj].getX(), floors[ii].getItems()[jj].getY());
         }
         return returned;
     }
@@ -416,6 +492,13 @@ public class Main {
                 gui.md_moveSprite(id_count, Ix, Iy);
             }
         }
+    }
+    public static void setGuiText(MiniDungeonGUI gui, Player player){
+        gui.md_setTextHealthMax(player.getHealth());
+        gui.md_setTextPerception(player.getPerception());
+        gui.md_setTextStrength(player.getPower());
+        gui.md_setTextFood(player.getFood());
+        gui.md_setTextHealthCurrent(player.getHealth());
     }
 }
 
