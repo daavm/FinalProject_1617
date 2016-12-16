@@ -11,6 +11,7 @@ public class Main {
         Floor[] floors = new Floor[5];
         MiniDungeonGUI gui = new MiniDungeonGUI(50, 50);
         gui.setVisible(true);
+        int time = 0;
         int eyeCount = 0; //eyecount goes here because there can only be 1 eye per 5 levels, and this game has only 5 levels(floors), so will only appear once
 
         //Choose which floor containt an eye.
@@ -60,7 +61,21 @@ public class Main {
                     }
                 }
             }
+            //ITEMS GENERATION
+            int id_count = 1;
+            for (int jj = 2; jj < 30; jj++) { //number of items to generate
+                id_count++;
+                if (generateItems(gui, floors, ii, jj, id_count, eyeCount) != 0) {
+                    eyeCount++;
+                }
+                //move every item to its position, even if it is still invisible
+                gui.md_moveSprite(id_count, floors[ii].getItems()[jj].getX(),floors[ii].getItems()[jj].getY());
 
+                if(floors[ii].getItems()[jj].getSeen() && !floors[ii].getItems()[jj].getTaken()){
+                    gui.md_setSpriteVisible(id_count, true);
+                    gui.md_moveSprite(id_count, floors[ii].getItems()[id_count].getX(), floors[ii].getItems()[id_count].getY());
+                }
+            }
             //RE-EXPLORE a floor, when going back to it through a 'back trapdoor'
             if(floors[ii].getExplored()) {
                 for(int jj = 0; jj < 50; jj++){
@@ -94,33 +109,28 @@ public class Main {
                 }while(x == 1);
             }
 
-            //ITEMS GENERATION
-            int id_count = 1;
-                for (int jj = 2; jj < 30; jj++) { //number of items to generate
-                    id_count++;
-                        if (generateItems(gui, floors, ii, jj, id_count, eyeCount) != 0) {
-                        eyeCount++;
-                    }
-                    //move every item to its position, even if it is still invisible
-                    gui.md_moveSprite(id_count, floors[ii].getItems()[jj].getX(),floors[ii].getItems()[jj].getY());
-                    //TODO only to test maps
-                    gui.md_setSquareColor(floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY(), 23, 43, 75);
-
-                    if(floors[ii].getItems()[jj].getSeen() && !floors[ii].getItems()[jj].getTaken()){
-                        gui.md_setSpriteVisible(id_count, true);
-                        gui.md_moveSprite(id_count, floors[ii].getItems()[id_count].getX(), floors[ii].getItems()[id_count].getY());
-                    }
-                }
+            //create and move Player's sprite
+            int x = floors[ii].getStartX(), y = floors[ii].getStartY();
+            gui.md_addSprite(1, "white-queen.png", true);
+            gui.md_setSpriteVisible(1, true);
 
             id_count++;
-                if(!floors[ii].getExplored()){
-                    for (int jj = 0; jj < 10; jj++){
+                if(!floors[ii].getExplored()) {
+                    for (int jj = 0; jj < 10; jj++) {
                         generateEnemies(gui, floors, ii, jj, id_count);
                         id_count++;
                     }
+                    gui.md_setSquareColor(x, y, floors[ii].getCells()[x][y].getRed(), floors[ii].getCells()[x][y].getGreen(), floors[ii].getCells()[x][y].getBlue());
+                    gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
+                } else {
+                    if (ii == 0) {
+                        gui.md_moveSprite(1, floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY());
+                        x = floors[ii].getTrapdoorX();
+                        y = floors[ii].getTrapdoorY();
+                    } else {
+                        gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
+                    }
                 }
-
-            int x = floors[ii].getStartX(), y = floors[ii].getStartY();
 
             //Color start cell for floors 2nd to 5th. It's also the back trapdoor, as it's where it appears when going through the
             //  previous floor's trapdoor
@@ -130,26 +140,7 @@ public class Main {
                 floors[ii].getCells()[x][y].setBlue(190);
             }
 
-
-            //sprite of the player generated
-            gui.md_addSprite(1, "white-queen.png", true);
-            gui.md_setSpriteVisible(1, true);
-            if(floors[ii].getExplored()){
-               if(ii == 0){
-                   gui.md_moveSprite(1, floors[ii].getTrapdoorX(), floors[ii].getTrapdoorY());
-                   x = floors[ii].getTrapdoorX();
-                   y = floors[ii].getTrapdoorY();
-               } else {
-                   gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
-               }
-
-            } else {
-                gui.md_moveSprite(1, floors[ii].getStartX(), floors[ii].getStartY());
-            }
-
             //paint start coordinates
-            gui.md_setSquareColor(x, y, floors[ii].getCells()[x][y].getRed(), floors[ii].getCells()[x][y].getGreen(), floors[ii].getCells()[x][y].getBlue());
-
 
 
             //MOVE
@@ -158,7 +149,6 @@ public class Main {
             do {
                 String lastAction = gui.md_getLastAction().toLowerCase();
                 //Move player 'sprite' depending on last action (left, right, up or down)
-                //TODO
                 if (lastAction.equals("left") && (x-1) >= 0) {
                     catchItem(gui, player, x-1, y, ii, floors);
                     if(thereIsEnemy(gui, floors, ii, (x-1), y) != -1){
@@ -299,6 +289,7 @@ public class Main {
                     moveCount = 0;
                 }
                 Thread.sleep(1);
+                time += 1;
 
                 //When going through a back-trapdoor, we reduce ii variable by '-2', so we save the previous ii value to be able
                 //  to 'close' the floor when exiting the do-while
@@ -350,8 +341,27 @@ public class Main {
             } while (!floors[floorNumber].isPassed());
 
         }
+        time = time/1000 + 13;
+        int timeH = 0, timeM = 0, timeS = 0;
+        do{
+            if(time - 60 >= 0){
+                timeS += 1;
+                time -= 1;
+            } else{
+                timeS += time;
+                time = 0;
+            }
+            if(timeS >= 60){
+                timeM += 1;
+                timeS -= 60;
+            }
+            if(timeM == 60){
+                timeH += 1;
+                timeM -= 60;
+            }
+        }while(time > 0);
         //Message the game shows when the player finishes last level
-        gui.md_showMessageDialog("Game over!\nYou reached level " + (reachedFloor+1) + "!\nScore: " + player.getGold() );
+        gui.md_showMessageDialog("Game over!\nYou reached level " + (-reachedFloor) + "!\nScore: " + player.getGold() + "\nTime: " + timeH + ":" + timeM + ":" + timeS);
     }
     public static void catchItem(MiniDungeonGUI gui, Player player, int x, int y, int ii, Floor[] floors){
         if(x >= 0 && x < 50 && y >= 0 && y < 50) {
@@ -559,6 +569,7 @@ public class Main {
                 }
                 enemy.setxDeath(x);
                 enemy.setyDeath(y);
+                gui.md_moveSprite(enemy.getId(), 0, 0);
                 gui.md_setSquareImage(enemy.getX(), enemy.getY(), "bones.png");
             } else {
                 int attack = (int) (Math.random()*10 + 1);
