@@ -1,9 +1,11 @@
 /**
- * Created by david on 11/23/2016.
+ * @author David and Sara
+ * @since December 2016
+ * @version 1.0
  */
 public class Cell {
-    private boolean explored, wall, haveItem; //wall means it's actually NOT wall TODO change name ¬¬
-    private int itemId;
+    private boolean explored, wall, haveItem, haveEnemy; //wall means it's actually NOT wall TODO change name ¬¬
+    private int itemId, enemyId;
     private long red, green, blue;
     private boolean room, corridor;
 
@@ -30,7 +32,14 @@ public class Cell {
     public int getItemId(){
         return itemId;
     }
+    public int getEnemyId(){
+        return enemyId;
+    }
+    public boolean getHaveEnemy(){ return haveEnemy;}
 
+    public void setHaveEnemy(boolean haveEnemy){
+        this.haveEnemy = haveEnemy;
+    }
     public void setRoom(boolean room){
         this.room = room;
     }
@@ -39,6 +48,9 @@ public class Cell {
     }
     public void setItemId(int Id){
         this.itemId = Id;
+    }
+    public void setEnemyId(int Id){
+        this.enemyId = Id;
     }
     public void setHaveItem(boolean item){
         haveItem = item;

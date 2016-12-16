@@ -1,3 +1,8 @@
+/**
+ * @author David and Sara
+ * @since December 2016
+ * @version 1.0
+ */
 public class Item {
 	private String name;
 	private int id, x, y;

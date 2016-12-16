@@ -1,7 +1,11 @@
-
+/**
+ * @author David and Sara
+ * @since December 2016
+ * @version 1.0
+ */
 public
 class Player {
-	private int health, maxHealth, power, perception, food, currX, currY, gold;
+	private int health, maxHealth, power, perception, food, gold;
 	
 	Player(){
 		setHealth(20);

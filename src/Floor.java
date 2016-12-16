@@ -1,3 +1,8 @@
+/**
+ * @author David and Sara
+ * @since December 2016
+ * @version 1.0
+ */
 public class Floor {
     private int startX, startY, number, trapdoorX, trapdoorY, heartCount, swordCount, eyeCount;
     private Cell[][] cells = new Cell[50][50];
@@ -48,12 +53,12 @@ public class Floor {
                 break;
         }
 
-      for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
+   /*   for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
             for (int jj = 0; jj < 50; jj++) {
                 cells[kk][jj].setExplored(true);
             }
         }
-
+*/
         for (int ii = 0; ii < rooms.length; ii++) {
             int x = 0, y = 0;
             for (int jj = 1; jj > 0; jj++) {
@@ -66,22 +71,14 @@ public class Floor {
                     }
                 }
 
-                x = (rooms[ii].getOriginX() + addX);//TODO use these for corridors entry (+height/base and -1/+1)
+                x = (rooms[ii].getOriginX() + addX);
                 y = (rooms[ii].getOriginY() + addY);
                 if (x >= 0 && x < 50 && y >= 0 && y < 50) {
                     jj = -1;
                 }
             }
 
-          /*  for(int jj = 0; jj < 50; jj++){
-                setCellsTrue(jj, y);
-                setCellsTrue(x, jj);
-                cells[jj][(y)].setCorridor(true);
-                cells[x][(jj)].setCorridor(true);
-
-            }*/
           for(int cc = 0; cc < rooms.length; cc++){
-              rooms[cc].getNearestRoom(rooms);
               int nearest = 0;
               if(cc != 0){ nearest = cc-1;} else {
                   nearest = cc+2;
@@ -209,9 +206,9 @@ public class Floor {
             items[ii] = new Item((int) (Math.random() * 6));
         }
         for (int ii = 0; ii < 10; ii++) {
-            enemies[ii] = new Enemy((int) (Math.random() * 2));
+            int gen = (int) (Math.random() * 3);
+            enemies[ii] = new Enemy(gen);
         }
-
     }
     public void setCellsTrue(int x, int y){
         cells[x][y].setWall(true);
