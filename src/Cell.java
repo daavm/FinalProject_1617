@@ -1,5 +1,5 @@
 /**
- * @author David and Sara
+ * @author David Marcos Mazón and Sara Timermans Pastor
  * @since December 2016
  * @version 1.0
  */
@@ -7,7 +7,7 @@ public class Cell {
     private boolean explored, wall, haveItem, haveEnemy; //wall means it's actually NOT wall TODO change name ¬¬
     private int itemId, enemyId;
     private long red, green, blue;
-    private boolean room, corridor;
+    private boolean room;
 
     Cell(){
         this.red = 112;
@@ -15,6 +15,8 @@ public class Cell {
         this.blue = 112;
     }
 
+
+    //getters and setter for all the fields
     public boolean getHaveItem(){
         return haveItem;
     }
@@ -24,27 +26,18 @@ public class Cell {
     public boolean getWall(){
         return wall;
     }
-    public boolean getRoom(){ return room;}
-    public boolean getCorridor(){ return corridor;}
     public int getRed(){return (int)red;};
     public int getGreen(){return (int)green;};
     public int getBlue(){return (int)blue;};
     public int getItemId(){
         return itemId;
     }
-    public int getEnemyId(){
-        return enemyId;
-    }
-    public boolean getHaveEnemy(){ return haveEnemy;}
 
     public void setHaveEnemy(boolean haveEnemy){
         this.haveEnemy = haveEnemy;
     }
     public void setRoom(boolean room){
         this.room = room;
-    }
-    public void setCorridor(boolean corridor){
-        this.corridor = corridor;
     }
     public void setItemId(int Id){
         this.itemId = Id;

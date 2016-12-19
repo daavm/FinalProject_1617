@@ -1,5 +1,5 @@
 /**
- * @author David and Sara
+ * @author David Marcos Mazón and Sara Timermans Pastor
  * @since December 2016
  * @version 1.0
  */
@@ -53,12 +53,6 @@ public class Floor {
                 break;
         }
 
-   /*   for (int kk = 0; kk < 50; kk++) { //TODO just for testing maps
-            for (int jj = 0; jj < 50; jj++) {
-                cells[kk][jj].setExplored(true);
-            }
-        }
-*/
         for (int ii = 0; ii < rooms.length; ii++) {
             int x = 0, y = 0;
             for (int jj = 1; jj > 0; jj++) {

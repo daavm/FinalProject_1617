@@ -1,6 +1,0 @@
-<component name="ArtifactManager">
-  <artifact name="FinalProject.zip">
-    <output-path>$PROJECT_DIR$/out/artifacts/FinalProject_zip</output-path>
-    <root id="root" />
-  </artifact>
-</component>

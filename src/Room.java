@@ -1,5 +1,5 @@
 /**
- * @author David and Sara
+ * @author David Marcos Mazón and Sara Timermans Pastor
  * @since December 2016
  * @version 1.0
  */
@@ -12,10 +12,14 @@ public class Room {
         height = (int)(Math.random()*4 + 3);
         base = (int)(Math.random()*4 + 3);
         for(int ii = 1; ii > 0; ii++) {
+            //get random origin point for the room that is being created
             originX = (int) (Math.random() * 50);
             originY = (int) (Math.random() * 50);
             int distance = 4;
             switch (id) {
+                //this method is a bit long, and we know it could be optimized. What it does is just to check the generated room does
+                //not overlap previously created rooms. It basically checks distance with the room that is being created and the others
+                //previously generated is bigger than a given number (4 in this case)
                 case 0:
                     ii = -1;
                     break;
@@ -70,6 +74,8 @@ public class Room {
             }
         }
     }
+
+    //getters, we did not need setters in this case
     public int getHeight(){ return height;}
     public int getBase(){ return base;}
     public int getOriginX(){
@@ -77,8 +83,5 @@ public class Room {
     }
     public int getOriginY(){
         return originY;
-    }
-    public int getId2(){
-        return id2;
     }
 }

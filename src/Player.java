@@ -1,5 +1,5 @@
 /**
- * @author David and Sara
+ * @author David Marcos Mazón and Sara Timermans Pastor
  * @since December 2016
  * @version 1.0
  */
@@ -8,13 +8,15 @@ class Player {
 	private int health, maxHealth, power, perception, food, gold;
 	
 	Player(){
+		//default values for the player
 		setHealth(20);
 		setMaxHealth(20);
 		setPower(1);
 		setPerception(1);
 		setFood(500);
 	}
-	
+
+	//getters and setters
 	public void setHealth(int health){
 		this.health = health;
 	}

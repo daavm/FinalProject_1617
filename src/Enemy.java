@@ -1,5 +1,5 @@
 /**
- * @author David and Sara
+ * @author David Marcos Mazón and Sara Timermans Pastor
  * @since December 2016
  * @version 1.0
  */
@@ -11,6 +11,8 @@ public class Enemy {
 
     Enemy(int ii){
         switch (ii){
+            //When an enemy is generated, a random number between 0 and 3 is generated as well. Depending on it, we will get an
+            //enemy or another
             case 0:
                 this.name = "black-bishop.png";
                 setHealth(10);
@@ -23,7 +25,8 @@ public class Enemy {
                 this.gen = ii;
                 setPower(3);
                 break;
-            case 2: this.name = "white-king.png";
+            case 2:
+                this.name = "white-king.png";
                 setHealth(10);
                 this.gen = ii;
                 setPower(1);
@@ -31,6 +34,7 @@ public class Enemy {
         }
     }
 
+    //getters and setters
     public String getName(){
         return name;
     }
@@ -62,9 +66,6 @@ public class Enemy {
     public void setId(int id){ this.id = id;}
     public void setxDeath(int xDeath){ this.xDeath = xDeath;}
     public void setyDeath(int yDeath){ this.yDeath = yDeath;}
-    public void setName(String name){
-        this.name = name;
-    }
     public void setHealth(int health){
         this.health = health;
     }

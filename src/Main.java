@@ -1,5 +1,5 @@
 /**
-* @author David and Sara
+* @author David Marcos Mazón and Sara Timermans Pastor
 * @since December 2016
 * @version 1.0
 */
@@ -14,7 +14,7 @@ public class Main {
         int time = 0;
         int eyeCount = 0; //eyecount goes here because there can only be 1 eye per 5 levels, and this game has only 5 levels(floors), so will only appear once
 
-        //Choose which floor containt an eye.
+        //Choose which floor containt an eye.º
         int hasEye = (int)(Math.random()*5), reachedFloor = 0;
         System.out.println(hasEye);
         for (int ii = 0; ii < floors.length; ii++) {
@@ -225,6 +225,8 @@ public class Main {
                         y++;
                         movements++;
                     }
+                } else if(lastAction.equals("command explore")){
+                    exploreAll(gui, floors, ii);
                 }
                 //Show and set cells explored depending on perception
                 if (x + player.getPerception() <= 49) {
@@ -361,30 +363,36 @@ public class Main {
             }
         }while(time > 0);
         //Message the game shows when the player finishes last level
-        gui.md_showMessageDialog("Game over!\nYou reached level " + (-reachedFloor) + "!\nScore: " + player.getGold() + "\nTime: " + timeH + ":" + timeM + ":" + timeS);
+        gui.md_showMessageDialog("Game over!\nYou reached level " + (-reachedFloor) + "!\nScore: " + player.getGold() + "\nTime: " + timeH + "H:" + timeM + "M:" + timeS + "S");
     }
     public static void catchItem(MiniDungeonGUI gui, Player player, int x, int y, int ii, Floor[] floors){
         if(x >= 0 && x < 50 && y >= 0 && y < 50) {
             Cell location = floors[ii].getCells()[x][y];
+
+            //check if the selected location (cell) contains an item or not, and if it has already been taken
             if (location.getHaveItem() && !floors[ii].getItems()[location.getItemId()].getTaken()) {
                 floors[ii].getItems()[location.getItemId()].setTaken(true);
                 gui.md_setSpriteVisible((location.getItemId()), false);
                 String item_name = floors[ii].getItems()[location.getItemId()].getName();
                 switch (item_name) {
                     case "Sword":
+                        //when the item is a sword, it increments player's strength by 1
                         player.setPower(player.getPower() + 1);
                         gui.md_setTextStrength(player.getPower());
                         break;
                     case "Heart":
+                        //when it's a heart, it adds 5 to the player's max health
                         player.setMaxHealth(player.getMaxHealth() + 5);
                         gui.md_setTextHealthMax(player.getMaxHealth());
                         gui.md_setTextHealthCurrent(player.getHealth());
                         break;
                     case "Eye":
+                        //the eye increases player's perception
                         player.setPerception(player.getPerception() + 1);
                         gui.md_setTextPerception(player.getPerception());
                         break;
                     case "Potion":
+                        //the potion heals the player
                         if (player.getHealth() <= (player.getMaxHealth() - 10)) {
                             player.setHealth(player.getHealth() + 10);
                         } else {
@@ -393,10 +401,12 @@ public class Main {
                         gui.md_setTextHealthCurrent(player.getHealth());
                         break;
                     case "Gold":
+                        //adds player's score
                         player.setGold(player.getGold() + ((int) (Math.random() * 901 + 100)));
                         gui.md_setTextGold(player.getGold());
                         break;
                     case "Apple":
+                        //increases player's food
                         player.setFood(player.getFood() + ((int) (Math.random() * 141 + 40)));
                         gui.md_setTextFood(player.getFood());
                         break;
@@ -404,6 +414,8 @@ public class Main {
             }
         }
     }
+
+    //paintCells and paintPerception methods paint cells when player discovers them thanks to his perception
     public static void paintCells(int x, int y, MiniDungeonGUI gui, Floor[] floors, int ii){
         if(x >= 0 && x < 50 && y >= 0 && y < 50) {
             Cell loc = floors[ii].getCells()[x][y];
@@ -432,6 +444,7 @@ public class Main {
 
         }
     }
+    //this method basically gets each items fields' values and depending on them it creates them in the board we have in the screen
     public static int generateItems(MiniDungeonGUI gui, Floor[] floors, int ii, int jj, int id_count, int eyeCount){
         String id = floors[ii].getItems()[jj].getName();
         int swordCount = floors[ii].getSwordCount(), heartCount = floors[ii].getHeartCount(), returned = 0;
@@ -548,9 +561,11 @@ public class Main {
         gui.md_setTextFood(player.getFood());
         gui.md_setTextHealthCurrent(player.getHealth());
     }
+    //we use this methos to check if there's an enemy or not in a certain cell
     public static int thereIsEnemy(MiniDungeonGUI gui, Floor[] floors, int ii, int x, int y){
         int enemy = -1;
         for (int jj = 0; jj < 10; jj++) {
+            //we just compare each enemy coordinates with some other given coordinates (x and y)
             if(floors[ii].getEnemies()[jj].getX() == x && floors[ii].getEnemies()[jj].getY() == y){
                 enemy = jj;
             }
@@ -558,11 +573,15 @@ public class Main {
 
         return enemy;
     }
+
+    //method to attack an enemy, or for the enemy to attack the player
     public static void doEnemy(MiniDungeonGUI gui, Player player, Floor[] floors, int x, int y, int ii, Enemy enemy){
         if(enemy.getHealth() > 0) {
+            //decrease enemy's health depending on the player's power/strength
             enemy.setHealth((enemy.getHealth() - player.getPower()));
             gui.md_println("Enemy loses " + player.getPower() + " health (" + enemy.getHealth() + " remaining)");
             if (enemy.getHealth() <= 0) {
+                enemy.setHealth(0);
                 gui.md_setSpriteVisible(enemy.getId(), false);
                 if(enemy.getGen() == 1){
                     exploreAll(gui, floors, ii);
@@ -572,6 +591,7 @@ public class Main {
                 gui.md_moveSprite(enemy.getId(), 0, 0);
                 gui.md_setSquareImage(enemy.getX(), enemy.getY(), "bones.png");
             } else {
+                //in this case, it is the player who gets his health decreased instead of the enemy
                 int attack = (int) (Math.random()*10 + 1);
                 switch (attack) {
                     case 1:
@@ -582,6 +602,7 @@ public class Main {
                         break;
                 }
             }
+            //player loses 3 of food when fighting against an enemy
             changeFood(gui, player, 3);
             setGuiText(gui, player);
         } else if (x > 0 && floors[ii].getCells()[x][y].getWall()) {
@@ -589,13 +610,17 @@ public class Main {
         }
     }
     public static void moveSprite(MiniDungeonGUI gui, Player player, int x, int y){
+        //this method just moves the player to a certain position, and decreases its food by 1 (due to walking)
         gui.md_moveSprite(1, x, y);
         changeFood(gui, player, 1);
     }
+
+    //method to decrease food faster from other methods
     public static void changeFood(MiniDungeonGUI gui, Player player, int change){
         if(player.getFood() != 0){
             player.setFood((player.getFood() - change));
             if(player.getFood() <= 0){
+                //in case food reaches 0 or less, we decided to use this code to avoid having negative food in the game screen
                 player.setFood(0);
                 player.setPower(player.getPower()/2);
                 player.setPerception(player.getPerception()/2);
@@ -606,12 +631,17 @@ public class Main {
             setGuiText(gui, player);
         }
     }
+    //the explore all method is used when the boss is killed or when the "explore" command is used
+    //this method could be improved making it also showing still invisible items and enemies, but we decided not to do it to focus
+    //on other things we hadn't done yet
     public static void exploreAll(MiniDungeonGUI gui, Floor[] floors, int ii){
         for(int jj = 0; jj < 50; jj++){
             for (int kk = 0; kk < 50; kk++){
+                //Paint all cells of a floor with its desired color, and set it as explored for next time player enters that floor
                 Cell location =  floors[ii].getCells()[jj][kk];
                 location.setExplored(true);
                 if(location.getWall() && location != floors[ii].getCells()[floors[ii].getStartX()][floors[ii].getStartY()] &&    location != floors[ii].getCells()[floors[ii].getTrapdoorX()][floors[ii].getTrapdoorY()]){
+                    //set color for startX/back trapdoor
                     location.setRed(170);
                     location.setGreen(191);
                     location.setBlue(226);
