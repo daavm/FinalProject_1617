@@ -7,6 +7,7 @@ public class Enemy {
     private String name;
     private int health, power, x, y, xDeath = 0, yDeath = 0, id, gen= 0;
     private boolean visible = true, seen = false;
+    private boolean test = false;
     //power puede ser 1.5
 
     Enemy(int ii){
